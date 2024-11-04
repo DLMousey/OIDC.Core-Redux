@@ -15,6 +15,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "localDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000");
+        policy.AllowAnyMethod();
+        policy.AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<OIDCCoreMinimalDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -50,6 +60,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("localDev");
 
 app.UseHttpsRedirection();
 
