@@ -1,0 +1,6 @@
+﻿services:
+  oidc.core-minimal:
+    image: oidc.core-minimal
+    build:
+      context: .
+      dockerfile: OIDC.Core-Minimal/Dockerfile

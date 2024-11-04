@@ -1,0 +1,6 @@
+@OIDC.Core_Minimal_HostAddress = http://localhost:5272
+
+GET {{OIDC.Core_Minimal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
