@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using OIDC.Core_Minimal.DAL.Configuration;
 
 namespace OIDC.Core_Minimal.DAL.Entities;
@@ -8,17 +12,32 @@ public class Application
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
+    [Required]
+    [MaxLength(32)]
     public string Name { get; set; }
 
-    public string Url { get; set; }
+    public string HomepageUrl { get; set; }
+    
+    public string CallbackUrl { get; set; }
 
+    [MaxLength(24)]
+    public string ClientId { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16));
+
+    [JsonIgnore]
+    [MaxLength(88)]
+    public string ClientSecret { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+    [JsonIgnore]
     public User User { get; set; }
 
+    [JsonIgnore]
     public Guid UserId { get; set; }
 
     public DateTime Created { get; set; } = DateTime.UtcNow;
 
+    [JsonIgnore]
     public ICollection<AccessToken> AccessTokens { get; set; }
 
+    [JsonIgnore]
     public ICollection<User> Users { get; set; }
 }

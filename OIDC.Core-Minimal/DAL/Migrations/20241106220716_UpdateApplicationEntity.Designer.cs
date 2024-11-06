@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OIDC.Core_Minimal.DAL;
@@ -11,9 +12,11 @@ using OIDC.Core_Minimal.DAL;
 namespace OIDC.Core_Minimal.DAL.Migrations
 {
     [DbContext(typeof(OIDCCoreMinimalDbContext))]
-    partial class OIDCCoreMinimalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241106220716_UpdateApplicationEntity")]
+    partial class UpdateApplicationEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
