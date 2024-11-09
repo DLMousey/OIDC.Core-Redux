@@ -59,6 +59,8 @@ public class OAuthController(
                 return await AuthorisationCode(strategiser, application);
             case OAuthStrategiser.Strategy.AuthorizationCodeExchange:
                 return await AuthorisationCodeExchange(strategiser, application);
+            case OAuthStrategiser.Strategy.Pkce:
+                return await PKCE(strategiser, application);
             case OAuthStrategiser.Strategy.ClientCredentials:
                 return await ClientCredentials(strategiser, application);
             case OAuthStrategiser.Strategy.PasswordGrant:
@@ -116,6 +118,8 @@ public class OAuthController(
                 return await AuthorisationCodeExchange(strategiser, application);
             case OAuthStrategiser.Strategy.ClientCredentials:
                 return await ClientCredentials(strategiser, application);
+            case OAuthStrategiser.Strategy.PkceExchange:
+                return await PKCEExchange(strategiser, application);
             default:
                 return BadRequest("Unknown oauth grant type requested");
         }
@@ -201,7 +205,9 @@ public class OAuthController(
         {
             UserId = user.Id,
             ClientId = vm.ClientId,
-            Scopes = vm.Scopes
+            Scopes = vm.Scopes,
+            CodeChallenge = vm.CodeChallenge,
+            CodeVerifier = vm.CodeVerifier
         };
 
         string encodedPayload = JsonSerializer.Serialize(payload);
@@ -273,6 +279,99 @@ public class OAuthController(
         });
     }
 
+    #endregion
+    
+    #region PKCE
+
+    private async Task<IActionResult> PKCE(OAuthStrategiser strategiser, Application application)
+    {
+        User user;
+
+        try
+        {
+            user = await userService.GetFromContextAsync(User);
+        }
+        catch (Exception e)
+        {
+            return BadRequest("Failed to retrieve user from context");
+        }
+
+        AccessToken? existingAt = await accessTokenService.FindAsync(user, application, strategiser.Scopes);
+        IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
+        
+        if (existingAt == null)
+        {
+            return Ok(new
+            {
+                application,
+                scopes
+            });
+        }
+
+        return Ok(new
+        {
+            application,
+            scopes,
+            authorised = true
+        });
+    }
+
+    private async Task<IActionResult> PKCEExchange(OAuthStrategiser strategiser, Application application)
+    {
+        if (strategiser.ClientId != application.ClientId)
+        {
+            return BadRequest("Invalid client id provided");
+        }
+
+        if (strategiser.Code == null)
+        {
+            return BadRequest("Must provide authorisation code");
+        }
+
+        byte[]? payloadRaw = await cache.GetAsync(strategiser.Code);
+        string payloadString;
+        if (payloadRaw == null)
+        {
+            return BadRequest("Invalid authorisation code provided");
+        }
+        else
+        {
+            payloadString = Encoding.UTF8.GetString(payloadRaw);
+        }
+
+        ConsentPayload? payload = JsonSerializer.Deserialize<ConsentPayload>(payloadString);
+        if (payload == null)
+        {
+            return new JsonResult("Malformed cache data, please perform authorisation flow again")
+                { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+
+        User? user = await userService.FindByIdAsync(payload.UserId);
+        string codeChallenge = payload.CodeChallenge;
+        string codeVerifier = payload.CodeVerifier;
+
+        byte[] verifierBytes = Encoding.UTF8.GetBytes(codeVerifier);
+        var verifierHash = SHA256.HashData(verifierBytes);
+
+        if (Base64UrlEncoder.Encode(verifierHash) != codeChallenge)
+        {
+            return BadRequest("Invalid code verifier provided");
+        }
+        
+        // Hash verifier with sha-256, check it matches the challenge from the cache
+        
+        IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
+        AccessToken token = await accessTokenService.CreateAsync(user, application, scopes);
+
+        // await cache.RemoveAsync(strategiser.Code);
+
+        return Ok(new
+        {
+            access_token = token.Code,
+            expires_in = token.ExpiresAt.Subtract(DateTime.UtcNow).TotalSeconds
+        });
+    }
+    
     #endregion
 
     #region client-credentials

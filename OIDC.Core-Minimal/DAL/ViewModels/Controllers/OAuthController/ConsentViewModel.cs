@@ -15,4 +15,8 @@ public class ConsentViewModel
 
     [Required]
     public string State { get; set; }
+
+    public string? CodeChallenge { get; set; }
+
+    public string? CodeVerifier { get; set; }
 }

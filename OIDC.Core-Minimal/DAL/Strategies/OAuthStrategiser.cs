@@ -12,7 +12,8 @@ public class OAuthStrategiser
     {
         AuthorizationCode,
         AuthorizationCodeExchange,
-        PKCE,
+        Pkce,
+        PkceExchange,
         ClientCredentials,
         DeviceCode,
         RefreshToken,
@@ -29,6 +30,7 @@ public class OAuthStrategiser
     public string? Code { get; set; }
     public string? CodeChallenge { get; set; }
     public string? CodeChallengeMethod { get; set; }
+    public string? CodeVerifier { get; set; }
     public string? GrantType { get; set; }
     public string? DeviceCode { get; set; }
     public string? RefreshToken { get; set; }
@@ -91,6 +93,7 @@ public class OAuthStrategiser
         bool hasState = !string.IsNullOrEmpty(State);
         bool hasCodeChallenge = !string.IsNullOrEmpty(CodeChallenge);
         bool hasCodeChallengeMethod = !string.IsNullOrEmpty(CodeChallengeMethod);
+        bool hasCodeVerifier = !string.IsNullOrEmpty(CodeVerifier);
         bool hasGrantType = !string.IsNullOrEmpty(GrantType);
         bool hasDeviceCode = !string.IsNullOrEmpty(DeviceCode);
         bool hasRefreshToken = !string.IsNullOrEmpty(RefreshToken);
@@ -125,6 +128,13 @@ public class OAuthStrategiser
                       hasCodeChallenge && 
                       hasCodeChallengeMethod && 
                       validCodeChallengeMethod;
+        bool isPkceExchange = hasGrantType &&
+                              validGrantType &&
+                              GrantType == "authorization_code" &&
+                              hasCode &&
+                              hasRedirectUri &&
+                              hasClientId &&
+                              hasCodeVerifier;
         bool isClientCredentials = !wantsCodeResponse &&
                                    hasGrantType &&
                                    validGrantType &&
@@ -164,7 +174,12 @@ public class OAuthStrategiser
 
         if (isPkce)
         {
-            return Strategy.PKCE;
+            return Strategy.Pkce;
+        }
+
+        if (isPkceExchange)
+        {
+            return Strategy.PkceExchange;
         }
 
         if (isClientCredentials)

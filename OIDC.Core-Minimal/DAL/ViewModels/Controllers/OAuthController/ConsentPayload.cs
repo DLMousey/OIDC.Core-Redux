@@ -9,4 +9,8 @@ public class ConsentPayload
     public string ClientId { get; set; }
 
     public IList<string> Scopes { get; set; }
+
+    public string? CodeChallenge { get; set; }
+
+    public string? CodeVerifier { get; set; }
 }
