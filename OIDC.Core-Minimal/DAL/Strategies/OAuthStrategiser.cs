@@ -1,4 +1,7 @@
 ﻿using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using OIDC.Core_Minimal.Util.Attributes;
 
 namespace OIDC.Core_Minimal.DAL.Strategies;
@@ -8,6 +11,7 @@ public class OAuthStrategiser
     public enum Strategy
     {
         AuthorizationCode,
+        AuthorizationCodeExchange,
         PKCE,
         ClientCredentials,
         DeviceCode,
@@ -22,6 +26,7 @@ public class OAuthStrategiser
     public string? RedirectUri { get; set; }
     public string? Scope { get; set; }
     public string? State { get; set; }
+    public string? Code { get; set; }
     public string? CodeChallenge { get; set; }
     public string? CodeChallengeMethod { get; set; }
     public string? GrantType { get; set; }
@@ -30,7 +35,7 @@ public class OAuthStrategiser
     public string? Username { get; set; }
     public string? Password { get; set; }
 
-    private List<string> Scopes { get; set; } = new List<string>();
+    public List<string> Scopes { get; set; } = new List<string>();
 
     public OAuthStrategiser(string queryString)
     {
@@ -44,18 +49,8 @@ public class OAuthStrategiser
             string[] parts = queryPair.Split("=");
             string key = parts[0].Replace("&", "").Replace("?", "");
             string value = parts[1];
-            
-            // Locate the underscore and capitalise the next letter after it
-            int index = key.IndexOf('_');
-            Char[] charArray = key.ToCharArray();
-            charArray[index + 1] = Char.ToUpper(charArray[index + 1]);
-            
-            // Uppercase the first character
-            charArray[0] = Char.ToUpper(charArray[0]);
-            
-            // Re-construct string from char array and remove underscore
-            key = new string(charArray).Replace("_", "");
-            
+
+            key = NormaliseKey(key);
             PropertyInfo? dynamicProperty = GetType().GetTypeInfo().GetDeclaredProperty(key);
             if (dynamicProperty == null)
             {
@@ -65,23 +60,30 @@ public class OAuthStrategiser
             dynamicProperty.SetValue(this, Convert.ChangeType(value, dynamicProperty.PropertyType));
         }
     }
+
+    // Secondary constructor for request bodies, primarily back channel requests
+    public OAuthStrategiser(Dictionary<string, string> body)
+    {
+        foreach (var kv in body)
+        {
+            string key = NormaliseKey(kv.Key);
+            PropertyInfo? dynamicProperty = GetType().GetTypeInfo().GetDeclaredProperty(key);
+            if (dynamicProperty == null)
+            {
+                return;
+            }
+
+            dynamicProperty.SetValue(this, Convert.ChangeType(kv.Value, dynamicProperty.PropertyType));
+        }
+    }
     
     public Strategy DetermineStrategy()
     {
-        // Working in order from the oauth.net/2/ page we'll look for the combination of properties
-        // that indicate the app is attempting to authorise via one of the following;
-            // - Authorization Code
-            // - PKCE
-            // - Client Credentials
-            // - Device Code
-            // - Refresh Token
-            // - Password Grant (marked as legacy - consider not accepting this grant type)
-        // We'll return the first strategy that's a match
-
         BuildScopes(true);
 
         // Existence
         bool wantsCodeResponse = ResponseType is "code";
+        bool hasCode = !string.IsNullOrEmpty(Code);
         bool hasClientId = !string.IsNullOrEmpty(ClientId);
         bool hasClientSecret = !string.IsNullOrEmpty(ClientSecret);
         bool hasRedirectUri = !string.IsNullOrEmpty(RedirectUri);
@@ -107,6 +109,13 @@ public class OAuthStrategiser
                                    hasRedirectUri && 
                                    hasScope && 
                                    hasState;
+        bool isAuthorizationCodeExchange = hasGrantType &&
+                                           validGrantType &&
+                                           GrantType == "authorization_code" &&
+                                           hasCode &&
+                                           hasRedirectUri &&
+                                           hasClientId &&
+                                           hasClientSecret;
         bool isPkce = wantsCodeResponse && 
                       validResponseType && 
                       hasClientId && 
@@ -146,6 +155,11 @@ public class OAuthStrategiser
         if (isAuthorizationCode)
         {
             return Strategy.AuthorizationCode;
+        }
+
+        if (isAuthorizationCodeExchange)
+        {
+            return Strategy.AuthorizationCodeExchange;
         }
 
         if (isPkce)
@@ -195,5 +209,19 @@ public class OAuthStrategiser
         }
         
         Scopes = Scope.Split(" ").ToList();
+    }
+
+    private string NormaliseKey(string key)
+    {
+        // Locate the underscore and capitalise the next letter after it
+        int index = key.IndexOf('_');
+        Char[] charArray = key.ToCharArray();
+        charArray[index + 1] = Char.ToUpper(charArray[index + 1]);
+            
+        // Uppercase the first letter
+        charArray[0] = Char.ToUpper(charArray[0]);
+            
+        // Re-construct string from char array and remove underscore
+        return new string(charArray).Replace("_", "");
     }
 }

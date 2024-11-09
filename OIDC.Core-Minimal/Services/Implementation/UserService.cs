@@ -30,10 +30,11 @@ public class UserService(OIDCCoreMinimalDbContext context) : IUserService
         return user;
     }
 
-    public async Task<User?> FindByEmailAsync(string email)
-    {
-        return await context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
-    }
+    public async Task<User?> FindByEmailAsync(string email) => 
+        await context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+
+    public async Task<User?> FindByIdAsync(Guid userId) => 
+        await context.Users.FirstOrDefaultAsync(u => u.Id.Equals(userId));
 
     public async Task<User> GetFromContextAsync(ClaimsPrincipal principal)
     {

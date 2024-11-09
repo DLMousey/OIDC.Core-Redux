@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OIDC.Core_Minimal.DAL.Configuration;
 
 namespace OIDC.Core_Minimal.DAL.Entities;
@@ -20,12 +21,14 @@ public class Application
     
     public string CallbackUrl { get; set; }
 
+    public string? CancelUrl { get; set; }
+
     [MaxLength(24)]
-    public string ClientId { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16));
+    public string ClientId { get; set; } = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(16));
 
     [JsonIgnore]
     [MaxLength(88)]
-    public string ClientSecret { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    public string ClientSecret { get; set; } = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(64));
 
     [JsonIgnore]
     public User User { get; set; }

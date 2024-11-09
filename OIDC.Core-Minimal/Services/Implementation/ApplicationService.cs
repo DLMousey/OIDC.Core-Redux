@@ -27,4 +27,7 @@ public class ApplicationService(OIDCCoreMinimalDbContext context) : IApplication
 
     public async Task<IList<Application>> GetPublishedAsync(User user) => 
         await context.Applications.Where(a => a.UserId.Equals(user.Id)).ToListAsync();
+
+    public async Task<Application?> FindAsync(string clientId) =>
+        await context.Applications.FirstOrDefaultAsync(a => a.ClientId.Equals(clientId));
 }

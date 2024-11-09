@@ -9,6 +9,8 @@ public interface IUserService
     public Task<User> CreateAsync(CreateAsyncViewModel vm);
 
     public Task<User?> FindByEmailAsync(string email);
+    
+    public Task<User?> FindByIdAsync(Guid userId);
 
     public bool ValidateCredentials(User user, string password);
 

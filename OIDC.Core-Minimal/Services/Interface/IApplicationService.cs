@@ -8,4 +8,6 @@ public interface IApplicationService
     public Task<Application> CreateAsync(CreateAsyncViewModel vm, User user);
 
     public Task<IList<Application>> GetPublishedAsync(User user);
+
+    public Task<Application?> FindAsync(string clientId);
 }

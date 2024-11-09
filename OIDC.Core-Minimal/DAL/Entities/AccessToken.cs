@@ -1,5 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OIDC.Core_Minimal.DAL.Configuration;
 
 namespace OIDC.Core_Minimal.DAL.Entities;
@@ -22,7 +24,11 @@ public class AccessToken
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
-    
+
+    public DateTime ExpiresAt { get; set; } = DateTime.UtcNow.AddMinutes(3600);
+
+    public string Code { get; set; } = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(64));
+
     [JsonIgnore]
     public ICollection<Scope> Scopes { get; set; }
 }
