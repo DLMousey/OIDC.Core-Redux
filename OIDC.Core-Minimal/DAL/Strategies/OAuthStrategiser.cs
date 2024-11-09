@@ -207,7 +207,8 @@ public class OAuthStrategiser
         {
             Scopes.Clear();
         }
-        
+
+        Scope = Uri.UnescapeDataString(Scope);
         Scopes = Scope.Split(" ").ToList();
     }
 

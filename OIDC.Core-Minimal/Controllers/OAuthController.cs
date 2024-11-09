@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.Strategies;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.OAuthController;
+using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
 using OIDC.Core_Minimal.Services.Interface;
 
 namespace OIDC.Core_Minimal.Controllers;
@@ -25,6 +27,7 @@ public class OAuthController(
     IDistributedCache cache
 ) : ControllerBase
 {
+    #region catch-all
     [EndpointDescription("Catch all endpoint for authorisation requests, dynamically determines grant type")]
     [HttpGet]
     [HttpPost]
@@ -71,22 +74,30 @@ public class OAuthController(
     [HttpPost("token")]
     public async Task<IActionResult> TokenAsync()
     {
-        if (!Request.Body.CanSeek)
+        OAuthStrategiser strategiser;
+        if (Request.QueryString.HasValue)
         {
-            Request.EnableBuffering();
+            strategiser = new OAuthStrategiser(Request.QueryString.Value);
         }
-
-        Request.Body.Position = 0;
-        Dictionary<string, string>? pairs = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(Request.Body);
-
-        if (pairs == null)
+        else
         {
-            return BadRequest("Unable to parse request body");
+            if (!Request.Body.CanSeek)
+            {
+                Request.EnableBuffering();
+            }
+
+            Request.Body.Position = 0;
+            Dictionary<string, string>? pairs = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(Request.Body);
+
+            if (pairs == null)
+            {
+                return BadRequest("Unable to parse request body");
+            }
+        
+            strategiser = new OAuthStrategiser(pairs);
         }
         
-        OAuthStrategiser strategiser = new OAuthStrategiser(pairs);
         OAuthStrategiser.Strategy strategy = strategiser.DetermineStrategy();
-
         if (strategiser.ClientId == null)
         {
             return BadRequest("No client id provided");
@@ -103,12 +114,16 @@ public class OAuthController(
         {
             case OAuthStrategiser.Strategy.AuthorizationCodeExchange:
                 return await AuthorisationCodeExchange(strategiser, application);
+            case OAuthStrategiser.Strategy.ClientCredentials:
+                return await ClientCredentials(strategiser, application);
             default:
                 return BadRequest("Unknown oauth grant type requested");
         }
     }
+    
+    #endregion
 
-    #region Authorisation Code Methods
+    #region authorisation-code
 
     // Return the data required for the consent screen - consent is handled by ConsentResultAsync method
     private async Task<IActionResult> AuthorisationCode(OAuthStrategiser strategiser, Application application)
@@ -260,12 +275,38 @@ public class OAuthController(
 
     #endregion
 
-    
-
+    #region client-credentials
     private async Task<IActionResult> ClientCredentials(OAuthStrategiser strategiser, Application application)
     {
-        return Ok("You requested a client credentials grant");
+        if (strategiser.ClientSecret != application.ClientSecret)
+        {
+            return BadRequest("Invalid client secret provided");
+        }
+
+        string prefix = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(12));
+        string password = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(32));
+        
+        // Generate a system user for the client
+        User user = await userService.CreateAsync(new CreateAsyncViewModel
+        {
+            Email = $"{prefix}@localhost",
+            Password = password,
+            Username = prefix
+        });
+        
+        IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
+        
+        // Generate access token linked to system user and return immediately
+        AccessToken accessToken = await accessTokenService.CreateAsync(user, application, scopes);
+        
+        return Ok(new
+        {
+            access_token = accessToken.Code,
+            expires_in = accessToken.ExpiresAt.Subtract(DateTime.UtcNow).TotalSeconds
+        });
     }
+    
+    #endregion
 
     [Obsolete("Password grant is no longer recommended - this endpoint will always return an error response")]
     private async Task<IActionResult> PasswordGrant(OAuthStrategiser strategiser, Application application)
