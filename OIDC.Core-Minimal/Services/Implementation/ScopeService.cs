@@ -24,4 +24,34 @@ public class ScopeService(OIDCCoreMinimalDbContext context) : IScopeService
 
         return scopes;
     }
+
+    public async Task<IList<Scope>> FindAllAsync()
+    {
+        return await context.Scopes.ToListAsync();
+    }
+
+    public async Task<Scope?> FindAsync(string name)
+    {
+        return await context.Scopes.FirstOrDefaultAsync(s => s.Name.Equals(name));
+    }
+
+    public async Task<Scope> CreateAsync(string name)
+    {
+        Scope? duplicate = await context.Scopes.FirstOrDefaultAsync(s => s.Name.Equals(name));
+        if (duplicate != null)
+        {
+            return duplicate;
+        }
+        
+        Scope scope = new Scope(name);
+        await context.Scopes.AddAsync(scope);
+        await context.SaveChangesAsync();
+
+        return scope;
+    }
+    
+    public void Delete(string name)
+    {
+        
+    }
 }
