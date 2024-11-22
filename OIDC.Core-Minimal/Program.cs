@@ -15,6 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Configuration.AddEnvironmentVariables(prefix: "OIDCC_");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "localDev", policy =>
@@ -26,7 +28,22 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<OIDCCoreMinimalDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (!builder.Configuration.GetValue<bool>("Database:FromEnvironment"))
+    {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));    
+    }
+    else
+    {
+        string? host = builder.Configuration.GetValue<string>("Database:Host");
+        string? port = builder.Configuration.GetValue<string>("Database:Port");
+        string? user = builder.Configuration.GetValue<string>("Database:User");
+        string? pass = builder.Configuration.GetValue<string>("Database:Password");
+        string? name = builder.Configuration.GetValue<string>("Database:Name");
+
+        options.UseNpgsql($"Host={host};Port={port};Username={user};Password={pass};Database={name}");
+    }
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -66,6 +83,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+if (builder.Configuration.GetValue<bool>("Database:RunMigrations"))
+{
+    IServiceScope serviceScope = app.Services.CreateScope();
+    OIDCCoreMinimalDbContext context = serviceScope.ServiceProvider.GetRequiredService<OIDCCoreMinimalDbContext>();
+    await context.Database.MigrateAsync();
+
+    serviceScope.Dispose();
 }
 
 app.UseCors("localDev");

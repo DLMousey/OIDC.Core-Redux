@@ -1,0 +1,72 @@
+﻿volumes:
+  pg_data: {}
+  prom_data: {}
+  graf_data: {}
+  
+services:
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+
+  database:
+    image: postgres:17.1
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - "POSTGRES_PASSWORD=password"
+      
+#  oidc.core-minimal:
+#    build:
+#      context: .
+#      dockerfile: OIDC.Core-Minimal/Dockerfile
+#    environment:
+#      - "OIDCC_Database__FromEnvironment=true"
+#      - "OIDCC_Database__RunMigrations=true"
+#      - "OIDCC_Database__Host=database"
+#      - "OIDCC_Database__Port=5432"
+#      - "OIDCC_Database__User=postgres"
+#      - "OIDCC_Database__Password=password"
+#      - "OIDCC_Database__Database=oidc_core_minimal"
+#      - "OTEL_TRACES_EXPORTER=otlp"
+#      - "OTEL_METRICS_EXPORTER=otlp"
+#      - "OTEL_LOGS_EXPORTER=otlp"
+#      - "OTEL_SERVICE_NAME=Oidc.Core-Redux_API"
+    
+  otel:
+    image: otel/opentelemetry-collector-contrib:latest
+    ports:
+      - "4317:4317" # gRPC receiver
+      - "4318:4318" # HTTP receiver
+    
+  prometheus:
+    image: prom/prometheus:latest
+    command: --config.file=/etc/prometheus/prometheus.yml --no-scrape.adjust-timestamps
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom_data:/prometheus
+  
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3500:3000"
+    volumes:
+      - graf_data:/var/lib/grafana
+  
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    environment:
+      - "COLLECTOR_OTLP_ENABLED=true"
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250"
+      - "6381:6381/udp"

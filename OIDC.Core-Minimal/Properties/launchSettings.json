@@ -16,7 +16,18 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5272",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OIDCC_Database__FromEnvironment": "true",
+        "OIDCC_Database__RunMigrations": "true",
+        "OIDCC_Database__Host": "127.0.0.1",
+        "OIDCC_Database__Port": "5432",
+        "OIDCC_Database__User": "postgres",
+        "OIDCC_Database__Password": "password",
+        "OIDCC_Database__Name": "oidc_core_minimal",
+        "OTEL_TRACES_EXPORTER": "otlp",
+        "OTEL_METRICS_EXPORTER": "otlp",
+        "OTEL_LOGS_EXPORTER": "otlp",
+        "OTEL_SERVICE_NAME": "Oidc.Core Redux_API"
       }
     },
     "https": {
@@ -26,7 +37,19 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7149;http://localhost:5272",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OIDCC_Database__FromEnvironment": "true",
+        "OIDCC_Database__RunMigrations": "true",
+        "OIDCC_Database__Host": "127.0.0.1",
+        "OIDCC_Database__Port": "5432",
+        "OIDCC_Database__User": "postgres",
+        "OIDCC_Database__Password": "password",
+        "OIDCC_Database__Name": "oidc_core_minimal",
+        "OTEL_TRACES_EXPORTER": "otlp",
+        "OTEL_METRICS_EXPORTER": "otlp",
+        "OTEL_LOGS_EXPORTER": "otlp",
+        "OTEL_SERVICE_NAME": "Oidc.Core Redux_API",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "127.0.0.1:4317"
       }
     },
     "IIS Express": {

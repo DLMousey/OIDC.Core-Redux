@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  oidc.core-minimal:
+    build:
+      context: "/home/mousey/RiderProjects/OIDC.Core-Redux"
+      dockerfile: "OIDC.Core-Minimal/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/OIDC.Core-Minimal.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "oidc.core-minimal:dev"
+    ports: []
+    volumes:
+    - "/home/mousey/.nuget/packages:/home/app/.nuget/packages"
+    - "/home/mousey/RiderProjects/OIDC.Core-Redux/OIDC.Core-Minimal:/app:rw"
+    - "/home/mousey/RiderProjects/OIDC.Core-Redux:/src:rw"
+    working_dir: "/app"
