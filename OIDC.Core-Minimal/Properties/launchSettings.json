@@ -24,10 +24,12 @@
         "OIDCC_Database__User": "postgres",
         "OIDCC_Database__Password": "password",
         "OIDCC_Database__Name": "oidc_core_minimal",
+        "OIDCC_Otel__Enabled": "true",
+        "OIDCC_Otel__OtlpEndpoint": "http://127.0.0.1:4317",
         "OTEL_TRACES_EXPORTER": "otlp",
         "OTEL_METRICS_EXPORTER": "otlp",
         "OTEL_LOGS_EXPORTER": "otlp",
-        "OTEL_SERVICE_NAME": "Oidc.Core Redux_API"
+        "OTEL_SERVICE_NAME": "oidc_core_api"
       }
     },
     "https": {
@@ -45,11 +47,14 @@
         "OIDCC_Database__User": "postgres",
         "OIDCC_Database__Password": "password",
         "OIDCC_Database__Name": "oidc_core_minimal",
+        "OIDCC_Otel__Enabled": "true",
+        "OIDCC_Otel__OtlpEndpoint": "http://127.0.0.1:4317",
         "OTEL_TRACES_EXPORTER": "otlp",
         "OTEL_METRICS_EXPORTER": "otlp",
         "OTEL_LOGS_EXPORTER": "otlp",
-        "OTEL_SERVICE_NAME": "Oidc.Core Redux_API",
-        "OTEL_EXPORTER_OTLP_ENDPOINT": "127.0.0.1:4317"
+        "OTEL_SERVICE_NAME": "oidc_core_api",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "127.0.0.1:4317",
+        "OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES": "OIDCCore.*"
       }
     },
     "IIS Express": {

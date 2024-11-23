@@ -13,6 +13,7 @@ using OIDC.Core_Minimal.DAL.Strategies;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.OAuthController;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
 using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Minimal.Util.Metrics;
 
 namespace OIDC.Core_Minimal.Controllers;
 
@@ -24,7 +25,8 @@ public class OAuthController(
     IUserService userService,
     IAccessTokenService accessTokenService,
     IScopeService scopeService,
-    IDistributedCache cache
+    IDistributedCache cache,
+    OAuthEvents oauthEvents
 ) : ControllerBase
 {
     #region catch-all
@@ -146,6 +148,7 @@ public class OAuthController(
         AccessToken? existingAt = await accessTokenService.FindAsync(user, application, strategiser.Scopes);
         IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
         
+        oauthEvents.Record("authorization_code-consent", user);
         // No existing access token found (including scopes) - considering this a new request flow
         if (existingAt == null)
         {
@@ -299,6 +302,7 @@ public class OAuthController(
         AccessToken? existingAt = await accessTokenService.FindAsync(user, application, strategiser.Scopes);
         IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
         
+        oauthEvents.Record("pkce-consent", user);
         if (existingAt == null)
         {
             return Ok(new
@@ -307,7 +311,7 @@ public class OAuthController(
                 scopes
             });
         }
-
+        
         return Ok(new
         {
             application,
@@ -386,6 +390,7 @@ public class OAuthController(
         string password = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(32));
         
         // Generate a system user for the client
+        // @TODO - make this idempotent based off app id
         User user = await userService.CreateAsync(new CreateAsyncViewModel
         {
             Email = $"{prefix}@localhost",
@@ -397,7 +402,7 @@ public class OAuthController(
         
         // Generate access token linked to system user and return immediately
         AccessToken accessToken = await accessTokenService.CreateAsync(user, application, scopes);
-        
+        oauthEvents.Record(strategiser.GrantType!, user, application);
         return Ok(new
         {
             access_token = accessToken.Code,

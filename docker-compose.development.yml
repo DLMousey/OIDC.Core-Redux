@@ -37,12 +37,20 @@ services:
 #      - "OTEL_LOGS_EXPORTER=otlp"
 #      - "OTEL_SERVICE_NAME=Oidc.Core-Redux_API"
     
-  otel:
+  otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector.yml"]
+    restart: unless-stopped
     ports:
-      - "4317:4317" # gRPC receiver
-      - "4318:4318" # HTTP receiver
-    
+      - "4317:4317" # HTTP receiver
+      - "4318:4318" # gRPC receiver
+      - "55679:55679" # zPages
+      - "1888:1888" # pProf
+      - "8888:8888"
+      - "8889:8889"
+    volumes:
+      - ./config/otel-collector.yml:/etc/otel-collector.yml
+
   prometheus:
     image: prom/prometheus:latest
     command: --config.file=/etc/prometheus/prometheus.yml --no-scrape.adjust-timestamps

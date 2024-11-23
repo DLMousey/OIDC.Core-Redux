@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using OIDC.Core_Minimal.DAL;
 using OIDC.Core_Minimal.Services.Implementation;
 using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Minimal.Util.Metrics;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,10 +77,44 @@ builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IScopeService, ScopeService>();
 
+// Metrics
+builder.Services.AddSingleton<AuthenticationEvents>();
+builder.Services.AddSingleton<OAuthEvents>();
+
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("RedisCache");
 });
+
+// Open Telemetry Instrumentation
+if (builder.Configuration.GetValue("Otel:Enabled", false))
+{
+    string? otelEndpoint = builder.Configuration.GetValue<string>("Otel:OtlpEndpoint");
+    if (otelEndpoint == null)
+    {
+        throw new ApplicationException("OTEL enabled but otlp endpoint not provided");
+    }
+
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(resource =>
+            resource.AddService(serviceName: "oidc_core_api"))
+        .WithTracing(tracingBuilder => tracingBuilder
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri(otelEndpoint);
+            }))
+        .WithMetrics(metricsBuilder => metricsBuilder
+            .AddAspNetCoreInstrumentation()
+            .AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri(otelEndpoint);
+            })
+            .AddMeter("OIDCCore.Authentication.*")
+            .AddMeter("OIDCCore.OAuth.*")
+        );
+}
 
 var app = builder.Build();
 
