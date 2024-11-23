@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.AuthenticationController;
 using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Minimal.Util.Metrics;
 
 namespace OIDC.Core_Minimal.Controllers;
 
@@ -12,7 +13,8 @@ namespace OIDC.Core_Minimal.Controllers;
 public class AuthenticationController(
     IUserService userService, 
     IJwtService jwtService,
-    IRefreshTokenService refreshTokenService
+    IRefreshTokenService refreshTokenService,
+    AuthenticationEvents authEvents
 ) : ControllerBase
 {
     [HttpPost("")]
@@ -37,6 +39,7 @@ public class AuthenticationController(
         
         if (userService.ValidateCredentials(user, vm.Password))
         {
+            authEvents.RecordSuccess(user);
             return Ok(new
             {
                 access_token = jwtService.GenerateJwt(user),
@@ -45,6 +48,7 @@ public class AuthenticationController(
             });
         }
 
+        authEvents.RecordFail(user);
         return BadRequest("Invalid credentials provided");
     }
 
@@ -53,17 +57,20 @@ public class AuthenticationController(
     {
         if (!ModelState.IsValid)
         {
+            authEvents.RecordFail(null, "refresh");
             return BadRequest(ModelState);
         }
 
         RefreshToken? token = await refreshTokenService.FindAsync(vm.RefreshToken);
         if (token == null)
         {
+            authEvents.RecordFail(null, "refresh");
             return BadRequest("Invalid refresh token provided");
         }
 
         await refreshTokenService.RecordUse(token);
-
+        authEvents.RecordSuccess(token.User, "refresh");
+        
         return Ok(new {
             access_token = jwtService.GenerateJwt(token.User),
             expires_in = 300,
