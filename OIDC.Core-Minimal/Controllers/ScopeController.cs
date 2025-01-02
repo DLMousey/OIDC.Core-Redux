@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OIDC.Core_Minimal.DAL.Entities;
+using OIDC.Core_Minimal.DAL.ViewModels.Controllers.ScopeController;
 using OIDC.Core_Minimal.Services.Interface;
 
 namespace OIDC.Core_Minimal.Controllers;
@@ -30,12 +31,19 @@ public class ScopeController(IScopeService scopeService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] string name)
+    [Authorize]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateAsyncViewModel vm)
     {
-        return Created($"/scopes/{name}", await scopeService.CreateAsync(name));
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return Created($"/scopes/{vm.Name}", await scopeService.CreateAsync(vm.Name));
     }
 
     [HttpDelete("{name}")]
+    [Authorize]
     public async Task<IActionResult> DeleteAsync(string name)
     {
         scopeService.Delete(name);
