@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
 using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Minimal.Util.Annotations;
 
 namespace OIDC.Core_Minimal.Controllers;
 
@@ -37,6 +38,7 @@ public class UserController(IUserService userService) : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
+    [RequireRole("Administrator")]
     public async Task<IActionResult> GetListAsync()
     {
         IList<User> users = await userService.GetListAsync();

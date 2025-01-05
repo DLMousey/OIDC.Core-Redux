@@ -10,4 +10,5 @@ public class OIDCCoreMinimalDbContext(DbContextOptions options) : DbContext(opti
     public virtual DbSet<Application> Applications { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<AccessToken> AccessTokens { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
 }

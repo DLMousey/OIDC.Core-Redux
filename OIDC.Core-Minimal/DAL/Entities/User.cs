@@ -31,4 +31,7 @@ public class User
 
     [JsonIgnore]
     public ICollection<RefreshToken> RefreshTokens { get; set; }
+
+    [JsonIgnore]
+    public ICollection<Role> Roles { get; set; }
 }
