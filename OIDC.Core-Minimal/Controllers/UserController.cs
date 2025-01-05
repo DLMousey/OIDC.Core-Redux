@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
 using OIDC.Core_Minimal.Services.Interface;
 
@@ -28,6 +29,18 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    }
+    
+    /// <summary>
+    /// This will need protecting by an RBAC attribute in the very near future, should be the next thing
+    /// that's implemented on the backend.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<IActionResult> GetListAsync()
+    {
+        IList<User> users = await userService.GetListAsync();
+        return Ok(users);
     }
 
     [HttpGet("private")]

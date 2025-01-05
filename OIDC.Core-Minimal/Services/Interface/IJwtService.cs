@@ -5,4 +5,6 @@ namespace OIDC.Core_Minimal.Services.Interface;
 public interface IJwtService
 {
     public string GenerateJwt(User user);
+
+    public string GenerateJwt(AccessToken accessToken);
 }

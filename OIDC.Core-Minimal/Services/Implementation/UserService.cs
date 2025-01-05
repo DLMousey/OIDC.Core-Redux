@@ -59,4 +59,10 @@ public class UserService(OIDCCoreMinimalDbContext context) : IUserService
     }
 
     public bool ValidateCredentials(User user, string password) => BCrypt.Net.BCrypt.Verify(password, user.Password);
+
+    // @TODO - consider how this will perform with a huge amount of users. Run some load testing
+    public async Task<IList<User>> GetListAsync()
+    {
+        return await context.Users.ToListAsync();
+    }
 }

@@ -15,4 +15,6 @@ public interface IUserService
     public bool ValidateCredentials(User user, string password);
 
     public Task<User> GetFromContextAsync(ClaimsPrincipal principal);
+
+    public Task<IList<User>> GetListAsync();
 }

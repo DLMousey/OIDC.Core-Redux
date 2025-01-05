@@ -12,8 +12,10 @@ using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.Strategies;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.OAuthController;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Minimal.Services.Implementation;
 using OIDC.Core_Minimal.Services.Interface;
 using OIDC.Core_Minimal.Util.Metrics;
+using IFormCollection = Microsoft.AspNetCore.Http.IFormCollection;
 
 namespace OIDC.Core_Minimal.Controllers;
 
@@ -26,6 +28,7 @@ public class OAuthController(
     IAccessTokenService accessTokenService,
     IScopeService scopeService,
     IDistributedCache cache,
+    IJwtService jwtService,
     OAuthEvents oauthEvents
 ) : ControllerBase
 {
@@ -78,6 +81,7 @@ public class OAuthController(
     [HttpPost("token")]
     public async Task<IActionResult> TokenAsync()
     {
+        Dictionary<string, string>? pairs = null;
         OAuthStrategiser strategiser;
         if (Request.QueryString.HasValue)
         {
@@ -91,8 +95,21 @@ public class OAuthController(
             }
 
             Request.Body.Position = 0;
-            Dictionary<string, string>? pairs = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(Request.Body);
-
+            switch (Request.ContentType)
+            {
+                case "application/x-www-form-urlencoded":
+                    pairs = new Dictionary<string, string>();
+                    IFormCollection values = await Request.ReadFormAsync();
+                    foreach (string valuesKey in values.Keys)
+                    {
+                        pairs[valuesKey] = values[valuesKey]!;
+                    }
+                    break;
+                case "application/json":
+                    pairs = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(Request.Body);
+                    break;
+            }
+            
             if (pairs == null)
             {
                 return BadRequest("Unable to parse request body");
@@ -104,7 +121,21 @@ public class OAuthController(
         OAuthStrategiser.Strategy strategy = strategiser.DetermineStrategy();
         if (strategiser.ClientId == null)
         {
-            return BadRequest("No client id provided");
+            // Sanity check pairs are set properly and the value is cached
+            if (pairs == null || !pairs.TryGetValue("code", out var clientId))
+            {
+                return BadRequest("No client id provided");
+            }
+            
+            // Try getting the client id from the authorisation request, otherwise fail
+            string? lookup = await cache.GetStringAsync(clientId);
+            if (lookup == null)
+            {
+                return BadRequest("No client id provided");
+            }
+            
+            ConsentPayload? payload = JsonSerializer.Deserialize<ConsentPayload>(lookup);
+            strategiser.ClientId = payload!.ClientId;
         }
         
         Application? application = await applicationService.FindAsync(strategiser.ClientId);
@@ -277,7 +308,7 @@ public class OAuthController(
         
         return Ok(new
         {
-            access_token = token.Code,
+            access_token = jwtService.GenerateJwt(token),
             expires_in = token.ExpiresAt.Subtract(DateTime.UtcNow).TotalSeconds
         });
     }

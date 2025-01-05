@@ -136,7 +136,7 @@ if (builder.Configuration.GetValue<bool>("Database:RunMigrations"))
 
 app.UseCors("localDev");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

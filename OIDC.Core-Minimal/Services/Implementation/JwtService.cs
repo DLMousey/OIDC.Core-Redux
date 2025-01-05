@@ -12,13 +12,12 @@ public class JwtService(IConfiguration configuration) : IJwtService
 {
     public string GenerateJwt(User user)
     {
-        string? signingKey = configuration.GetValue<string>("JWT:SigningKey");
-        if (signingKey == null)
+        if (SigningKey == null)
         {
             throw new ApplicationException("JWT:SigningKey is missing");
         }
         
-        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         JwtSecurityToken token = new JwtSecurityToken(
@@ -29,7 +28,8 @@ public class JwtService(IConfiguration configuration) : IJwtService
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Email, user.Email),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.AuthTime, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture))
+                new(JwtRegisteredClaimNames.AuthTime, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                new("username", user.Username)
             },
             expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
@@ -37,4 +37,36 @@ public class JwtService(IConfiguration configuration) : IJwtService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public string GenerateJwt(AccessToken accessToken)
+    {
+        if (SigningKey == null)
+        {
+            throw new ApplicationException("JWT:SigningKey is missing");
+        }
+        
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
+        SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        JwtSecurityToken token = new JwtSecurityToken(
+            issuer: configuration.GetValue<string>("JWT:Issuer"),
+            audience: configuration.GetValue<string>("JWT:Audience"),
+            claims: new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Email, accessToken.User.Email),
+                new(JwtRegisteredClaimNames.Sub, accessToken.UserId.ToString()),
+                new(JwtRegisteredClaimNames.AuthTime,
+                    accessToken.ExpiresAt.ToString("o", CultureInfo.InvariantCulture)),
+                new("username", accessToken.User.Username),
+                new("clientId", accessToken.Application.ClientId)
+            },
+            expires: accessToken.ExpiresAt,
+            signingCredentials: creds
+        );
+        
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    private string? SigningKey => configuration.GetValue<string>("JWT:SigningKey");
 }
