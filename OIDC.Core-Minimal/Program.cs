@@ -76,6 +76,7 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IScopeService, ScopeService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Metrics
 builder.Services.AddSingleton<AuthenticationEvents>();

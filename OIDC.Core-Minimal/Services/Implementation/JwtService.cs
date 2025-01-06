@@ -17,10 +17,7 @@ public class JwtService(IConfiguration configuration) : IJwtService
             throw new ApplicationException("JWT:SigningKey is missing");
         }
         
-        IList<string> roleNames = new List<string>()
-        {
-            "Administrator", "User"
-        };
+        IList<string> roleNames = user.Roles.Select(r => r.Name).ToList();
         
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -54,10 +51,7 @@ public class JwtService(IConfiguration configuration) : IJwtService
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        IList<string> roleNames = new List<string>()
-        {
-            "Administrator", "User"
-        };
+        IList<string> roleNames = accessToken.User.Roles.Select(r => r.Name).ToList();
         
         JwtSecurityToken token = new JwtSecurityToken(
             issuer: configuration.GetValue<string>("JWT:Issuer"),
