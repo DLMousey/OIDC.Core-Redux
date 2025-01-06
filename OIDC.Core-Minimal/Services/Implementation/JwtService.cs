@@ -17,6 +17,8 @@ public class JwtService(IConfiguration configuration) : IJwtService
             throw new ApplicationException("JWT:SigningKey is missing");
         }
         
+        IList<string> roleNames = user.Roles.Select(r => r.Name).ToList();
+        
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -29,7 +31,8 @@ public class JwtService(IConfiguration configuration) : IJwtService
                 new(JwtRegisteredClaimNames.Email, user.Email),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.AuthTime, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
-                new("username", user.Username)
+                new("username", user.Username),
+                new("roles", string.Join(", ", roleNames.ToArray()))
             },
             expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
@@ -48,6 +51,8 @@ public class JwtService(IConfiguration configuration) : IJwtService
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SigningKey));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        IList<string> roleNames = accessToken.User.Roles.Select(r => r.Name).ToList();
+        
         JwtSecurityToken token = new JwtSecurityToken(
             issuer: configuration.GetValue<string>("JWT:Issuer"),
             audience: configuration.GetValue<string>("JWT:Audience"),
@@ -59,7 +64,8 @@ public class JwtService(IConfiguration configuration) : IJwtService
                 new(JwtRegisteredClaimNames.AuthTime,
                     accessToken.ExpiresAt.ToString("o", CultureInfo.InvariantCulture)),
                 new("username", accessToken.User.Username),
-                new("clientId", accessToken.Application.ClientId)
+                new("clientId", accessToken.Application.ClientId),
+                new("roles", string.Join(", ", roleNames.ToArray()))
             },
             expires: accessToken.ExpiresAt,
             signingCredentials: creds

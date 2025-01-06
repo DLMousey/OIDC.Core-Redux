@@ -18,5 +18,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasMany<AccessToken>(u => u.AccessTokens)
             .WithOne(at => at.User)
             .HasForeignKey(at => at.UserId);
+
+        builder.HasMany<Role>(u => u.Roles)
+            .WithMany(r => r.Users);
     }
 }
