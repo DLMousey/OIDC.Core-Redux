@@ -62,4 +62,11 @@ public class ApplicationServiceTest
             Assert.That(application.ClientId, Is.EqualTo(_testApplication.ClientId));
         });
     }
+
+    
+    [TearDown]
+    public void Teardown()
+    {
+        _context.Dispose();
+    }
 }

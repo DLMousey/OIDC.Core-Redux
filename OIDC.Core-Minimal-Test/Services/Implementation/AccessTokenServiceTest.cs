@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OIDC.Core_Minimal_Test.TestUtil;
 using OIDC.Core_Minimal.DAL;
 using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.Services.Implementation;
@@ -22,35 +23,18 @@ public class AccessTokenServiceTest
             .Options;
 
         var context = new OIDCCoreMinimalDbContext(options);
-        _testUser = new User
+        _testUser = UserGenerator.GenerateFixed();
+        _testApplication = ApplicationGenerator.GenerateFixed(_testUser);
+
+        IList<Scope> scopes = ScopeGenerator.GenerateFixed();
+        foreach (Scope scope in scopes)
         {
-            Email = "info@example.com",
-            Username = "Test User",
-            Password = BCrypt.Net.BCrypt.HashPassword("password"),
-        };
-        _testApplication = new Application
-        {
-            Name = "Test Application",
-            HomepageUrl = "https://example.com",
-            CallbackUrl = "https://example.com/oauth",
-            CancelUrl = "https://example.com/oauth-cancel",
-            User = _testUser,
-            UserId = _testUser.Id
-        };
-        Scope read = new Scope("profile.read");
-        Scope write = new Scope("profile.write");
+            context.Scopes.Add(scope);
+        }
         
-        context.Scopes.Add(read);
-        context.Scopes.Add(write);
         context.Users.Add(_testUser);
-        context.AccessTokens.Add(new AccessToken
-        {
-            User = _testUser,
-            UserId = _testUser.Id,
-            Application = _testApplication,
-            ApplicationId = _testApplication.Id,
-            Scopes = new List<Scope> { read, write }
-        });
+        context.AccessTokens.Add(AccessTokenGenerator.GenerateFixed(scopes));
+        
         context.SaveChanges();
 
         _context = context;
@@ -61,8 +45,11 @@ public class AccessTokenServiceTest
     [Test]
     public void RetrieveAccessTokenByUserApplicationAndScopes()
     {
-        IList<string> scopes = new List<string> { "profile.read", "profile.write" };
-        AccessToken? accessToken = _accessTokenService.FindAsync(_testUser, _testApplication, scopes).Result;
+        AccessToken? accessToken = _accessTokenService.FindAsync(
+            _testUser, 
+            _testApplication, 
+            ScopeGenerator.FixedNames()
+        ).Result;
         
         Assert.IsNotNull(accessToken);
         Assert.That(accessToken.ApplicationId, Is.EqualTo(_testApplication.Id));
@@ -79,5 +66,11 @@ public class AccessTokenServiceTest
         Assert.That(accessToken.ApplicationId, Is.EqualTo(_testApplication.Id));
         Assert.That(accessToken.UserId, Is.EqualTo(_testUser.Id));
         Assert.That(accessToken.Scopes, Is.EquivalentTo(scopes));
+    }
+
+    [TearDown]
+    public void Teardown()
+    {
+        _context.Dispose();
     }
 }
