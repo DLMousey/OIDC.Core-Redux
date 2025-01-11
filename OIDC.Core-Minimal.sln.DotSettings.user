@@ -7,5 +7,7 @@
     &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.FindAsyncTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.CreatesNewAccessToken&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.RetrieveAccessTokenByUserApplicationAndScopes&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.ApplicationServiceTest.CanRetrievePublishedApplicationsForUser&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.ApplicationServiceTest.CanRetrieveApplicationsByClientId&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
