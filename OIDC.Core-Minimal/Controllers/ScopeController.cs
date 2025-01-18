@@ -9,12 +9,11 @@ namespace OIDC.Core_Minimal.Controllers;
 [ApiController]
 [Route("/scopes")]
 [AllowAnonymous]
-public class ScopeController(IScopeService scopeService, ILogger<ScopeController> logger) : ControllerBase
+public class ScopeController(IScopeService scopeService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetListAsync()
     {
-        logger.LogInformation("Retrieving scopes");
         IList<Scope> scopes = await scopeService.FindAllAsync();
         return Ok(scopes);
     }
