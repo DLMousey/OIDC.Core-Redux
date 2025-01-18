@@ -1,13 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAssert_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F46a322d26154b982566e1817203e5452c91223f93b0e392d9c5b4806696fdc1_003FAssert_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ATypeInfo_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fde3edec1170e48a0a2478d8743508635c8e910_003F5c_003F943a440f_003FTypeInfo_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0f3a8d4f_002D9931_002D41be_002D8dea_002D06f9596a6981/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="RetrievesScopesListViaContext" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.ScopeServiceTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.FindAsyncTest&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.CreatesNewAccessToken&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.AccessTokenServiceTest.RetrieveAccessTokenByUserApplicationAndScopes&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.ApplicationServiceTest.CanRetrievePublishedApplicationsForUser&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Minimal_Test.Services.Implementation.ApplicationServiceTest.CanRetrieveApplicationsByClientId&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7463b902_002D7cb5_002D442c_002D8e2e_002D354ce349cf50/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;OIDC.Core-Minimal-Test&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/Users/tlovelady/Dev/OIDC.Core/OIDC.Core-Redux/OIDC.Core-Minimal-Test" Presentation="&amp;lt;OIDC.Core-Minimal-Test&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>
