@@ -8,6 +8,7 @@ using OIDC.Core_Minimal.Services.Implementation;
 using OIDC.Core_Minimal.Services.Interface;
 using OIDC.Core_Minimal.Util.Metrics;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -115,6 +116,13 @@ if (builder.Configuration.GetValue("Otel:Enabled", false))
             .AddMeter("OIDCCore.Authentication.*")
             .AddMeter("OIDCCore.OAuth.*")
         );
+
+    builder.Logging.AddOpenTelemetry(loggingBuilder => loggingBuilder.AddOtlpExporter(
+        "logging",
+        options =>
+        {
+            options.Endpoint = new Uri(otelEndpoint);
+        }));
 }
 
 var app = builder.Build();
