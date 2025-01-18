@@ -67,6 +67,11 @@ services:
       - "3500:3000"
     volumes:
       - graf_data:/var/lib/grafana
+    
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
   
   jaeger:
     image: jaegertracing/all-in-one:latest
