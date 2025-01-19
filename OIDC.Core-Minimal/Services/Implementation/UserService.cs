@@ -1,13 +1,18 @@
 ﻿using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using OIDC.Core_Minimal.DAL;
 using OIDC.Core_Minimal.DAL.Entities;
 using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Minimal.DAL.ViewModels.Services.MailService;
 using OIDC.Core_Minimal.Services.Interface;
 
 namespace OIDC.Core_Minimal.Services.Implementation;
 
-public class UserService(OIDCCoreMinimalDbContext context) : IUserService
+public class UserService(
+    OIDCCoreMinimalDbContext context,
+    IMailService mailService
+) : IUserService
 {
     public async Task<User> CreateAsync(CreateAsyncViewModel vm)
     {
@@ -27,6 +32,27 @@ public class UserService(OIDCCoreMinimalDbContext context) : IUserService
         await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
 
+        string userJson = JsonSerializer.Serialize(user);
+        Dictionary<string, string> emailData = new Dictionary<string, string>();
+        emailData.Add("User", userJson);
+
+        try
+        {
+            await mailService.SendToUserAsync(new EmailViewModel
+            {
+                Slug = "platform-welcome",
+                Subject = "Welcome to OIDC.Core",
+                ToName = user.Username,
+                ToAddress = user.Email,
+                User = user,
+                Data = emailData
+            }, user);
+        }
+        catch
+        {
+            // ignored
+        }
+        
         return user;
     }
 
