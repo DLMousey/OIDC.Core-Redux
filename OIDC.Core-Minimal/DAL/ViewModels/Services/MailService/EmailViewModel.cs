@@ -22,8 +22,6 @@ public class EmailViewModel
 
     public string? FromAddress { get; set; }
 
-    public string? Email { get; set; }
-
     public User? User { get; set; }
 
     public Dictionary<string, string>? Data { get; set; }
