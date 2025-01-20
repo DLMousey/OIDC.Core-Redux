@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OIDC.Core_Minimal_Test.TestUtil;
 using OIDC.Core_Minimal.DAL;
 using OIDC.Core_Minimal.DAL.Entities;
@@ -30,8 +31,14 @@ public class ApplicationServiceTest
         context.Applications.Add(_testApplication);
         context.SaveChanges();
 
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection()
+            .Build();
+        var mailService = new MailService(configuration);
         _applicationService = new ApplicationService(context);
-        _userService = new UserService(context);
+        _userService = new UserService(context, mailService);
+        
         _context = context;
     }
 
