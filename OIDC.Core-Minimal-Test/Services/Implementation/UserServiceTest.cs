@@ -45,4 +45,18 @@ public class UserServiceTest
             Assert.That(user.Username, Is.EqualTo(_testUser.Username));
         });
     }
+
+    [Test]
+    public void CanRetrieveUserById()
+    {
+        User? user = _userService.FindByIdAsync(_testUser.Id).Result;
+
+        Assert.That(user, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(user.Id, Is.EqualTo(_testUser.Id));
+            Assert.That(user.Email, Is.EqualTo(_testUser.Email));
+            Assert.That(user.Username, Is.EqualTo(_testUser.Username));
+        });
+    }
 }
