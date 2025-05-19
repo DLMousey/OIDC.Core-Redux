@@ -10,7 +10,9 @@ public class RefreshToken
 
     public Guid UserId { get; set; }
 
-    public string Code { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    // Turns out either dotnet or EF core is stripping out the == b64 padding causing queries to fail here.
+    // Swapped out for a hex string in the meantime - ideally should urlencode b64 which doesn't add padding
+    public string Code { get; set; } = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
 
     public int Uses { get; set; }
 

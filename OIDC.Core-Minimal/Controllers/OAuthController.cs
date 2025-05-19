@@ -26,6 +26,7 @@ public class OAuthController(
     IApplicationService applicationService,
     IUserService userService,
     IAccessTokenService accessTokenService,
+    IRefreshTokenService refreshTokenService,
     IScopeService scopeService,
     IDistributedCache cache,
     IJwtService jwtService,
@@ -153,6 +154,8 @@ public class OAuthController(
                 return await ClientCredentials(strategiser, application);
             case OAuthStrategiser.Strategy.PkceExchange:
                 return await PKCEExchange(strategiser, application);
+            case OAuthStrategiser.Strategy.RefreshToken:
+                return await RefreshTokenGrant(strategiser, application);
             default:
                 return BadRequest("Unknown oauth grant type requested");
         }
@@ -449,8 +452,34 @@ public class OAuthController(
         return BadRequest("Password grant is no longer supported");
     }
 
+    // Should assume any requests being made to this endpoint are anonymous and use the refresh token
+    // as the source of truth on the user.
     private async Task<IActionResult> RefreshTokenGrant(OAuthStrategiser strategiser, Application application)
     {
-        return Ok("You requested a refresh token grant");
+        // Should never trigger this block since a non-null refresh token is required for the 
+        // strategiser to correctly identify a refresh token grant attempt, but doesn't hurt
+        // to be paranoid.
+        if (strategiser.RefreshToken == null)
+        {
+            return BadRequest("No refresh token provided");
+        }
+        
+        // Deliberately obfuscated response to prevent this endpoint being used as a screening 
+        // tool - should ideally log and count requests that make it here as they could
+        // represent an attacker abusing the API
+        RefreshToken? refreshToken = await refreshTokenService.FindAsync(strategiser.RefreshToken);
+        if (refreshToken == null)
+        {
+            return BadRequest("No refresh token provided");
+        }
+
+        string jwt = jwtService.GenerateJwt(refreshToken.User);
+        await refreshTokenService.RecordUse(refreshToken);
+        
+        return Ok(new
+        {
+            access_token = jwt,
+            expires_in = 300
+        });
     }
 }

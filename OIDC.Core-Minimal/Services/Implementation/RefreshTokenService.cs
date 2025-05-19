@@ -30,12 +30,15 @@ public class RefreshTokenService(OIDCCoreMinimalDbContext context) : IRefreshTok
 
     public async Task<RefreshToken?> FindAsync(string code)
     {
-        return await context.RefreshTokens
+        var result = await context.RefreshTokens
             .Include(rt => rt.User)
+            .ThenInclude(u => u.Roles)
             .FirstOrDefaultAsync(
-            rt => rt.Code.Equals(code) &&
-                  rt.ExpiresAt >= DateTime.UtcNow
-        );
+                rt => rt.Code.Equals(code) &&
+                      rt.ExpiresAt >= DateTime.UtcNow
+            );
+
+        return result;
     }
 
     public async Task<RefreshToken> RecordUse(RefreshToken refreshToken)
