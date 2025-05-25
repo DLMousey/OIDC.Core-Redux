@@ -30,7 +30,8 @@ public class OAuthController(
     IScopeService scopeService,
     IDistributedCache cache,
     IJwtService jwtService,
-    OAuthEvents oauthEvents
+    APIEvents apiEvents,
+    ILogger<OAuthController> logger
 ) : ControllerBase
 {
     #region catch-all
@@ -56,8 +57,11 @@ public class OAuthController(
 
         if (application == null)
         {
+            apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, null, application, false);
             return BadRequest("Invalid client id provided");
         }
+        
+        apiEvents.RecordOAuthGrantUsage(strategiser.GrantType ?? "unknown/invalid", null, application);
         
         switch (strategy)
         {
@@ -182,7 +186,7 @@ public class OAuthController(
         AccessToken? existingAt = await accessTokenService.FindAsync(user, application, strategiser.Scopes);
         IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
         
-        oauthEvents.Record("authorization_code-consent", user);
+        apiEvents.RecordOAuthGrantUsage("authorization_code-consent", user);
         // No existing access token found (including scopes) - considering this a new request flow
         if (existingAt == null)
         {
@@ -336,7 +340,7 @@ public class OAuthController(
         AccessToken? existingAt = await accessTokenService.FindAsync(user, application, strategiser.Scopes);
         IList<Scope> scopes = await scopeService.GetScopesAsync(strategiser.Scopes);
         
-        oauthEvents.Record("pkce-consent", user);
+        apiEvents.RecordOAuthGrantUsage("pkce-consent", user);
         if (existingAt == null)
         {
             return Ok(new
@@ -436,7 +440,7 @@ public class OAuthController(
         
         // Generate access token linked to system user and return immediately
         AccessToken accessToken = await accessTokenService.CreateAsync(user, application, scopes);
-        oauthEvents.Record(strategiser.GrantType!, user, application);
+        apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, user, application);
         return Ok(new
         {
             access_token = accessToken.Code,
@@ -461,6 +465,8 @@ public class OAuthController(
         // to be paranoid.
         if (strategiser.RefreshToken == null)
         {
+            logger.LogInformation("Recorded oauth event failure");
+            apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, null, application);
             return BadRequest("No refresh token provided");
         }
         
@@ -470,11 +476,16 @@ public class OAuthController(
         RefreshToken? refreshToken = await refreshTokenService.FindAsync(strategiser.RefreshToken);
         if (refreshToken == null)
         {
+            logger.LogInformation("Recorded oauth event failure");
+            apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, null, application);
             return BadRequest("No refresh token provided");
         }
 
         string jwt = jwtService.GenerateJwt(refreshToken.User);
         await refreshTokenService.RecordUse(refreshToken);
+        
+        logger.LogInformation("Recorded oauth event success");
+        apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, refreshToken.User, application);
         
         return Ok(new
         {

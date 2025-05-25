@@ -14,7 +14,8 @@ public class AuthenticationController(
     IUserService userService, 
     IJwtService jwtService,
     IRefreshTokenService refreshTokenService,
-    AuthenticationEvents authEvents
+    APIEvents apiEvents,
+    ILogger<AuthenticationController> logger
 ) : ControllerBase
 {
     [HttpPost("")]
@@ -39,7 +40,8 @@ public class AuthenticationController(
         
         if (userService.ValidateCredentials(user, vm.Password))
         {
-            authEvents.RecordSuccess(user);
+            logger.LogInformation("Recorded successful authentication attempt");
+            apiEvents.RecordAuthenticationAttempt(user);
             return Ok(new
             {
                 access_token = jwtService.GenerateJwt(user),
@@ -48,7 +50,8 @@ public class AuthenticationController(
             });
         }
 
-        authEvents.RecordFail(user);
+        logger.LogInformation("Recorded failed authentication attempt");
+        apiEvents.RecordAuthenticationAttempt(user, "credentials", false);
         return BadRequest("Invalid credentials provided");
     }
 
@@ -57,19 +60,19 @@ public class AuthenticationController(
     {
         if (!ModelState.IsValid)
         {
-            authEvents.RecordFail(null, "refresh");
+            apiEvents.RecordAuthenticationAttempt(null, "refresh", false);
             return BadRequest(ModelState);
         }
 
         RefreshToken? token = await refreshTokenService.FindAsync(vm.RefreshToken);
         if (token == null)
         {
-            authEvents.RecordFail(null, "refresh");
+            apiEvents.RecordAuthenticationAttempt(null, "refresh", false);
             return BadRequest("Invalid refresh token provided");
         }
 
         await refreshTokenService.RecordUse(token);
-        authEvents.RecordSuccess(token.User, "refresh");
+        apiEvents.RecordAuthenticationAttempt(token.User, "refresh");
         
         return Ok(new {
             access_token = jwtService.GenerateJwt(token.User),

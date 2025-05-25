@@ -7,6 +7,7 @@ using OIDC.Core_Minimal.DAL;
 using OIDC.Core_Minimal.Services.Implementation;
 using OIDC.Core_Minimal.Services.Interface;
 using OIDC.Core_Minimal.Util.Metrics;
+using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -18,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddMetrics();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -81,8 +83,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IMailService, MailService>();
 
 // Metrics
-builder.Services.AddSingleton<AuthenticationEvents>();
-builder.Services.AddSingleton<OAuthEvents>();
+builder.Services.AddSingleton<APIEvents>();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -98,6 +99,19 @@ if (builder.Configuration.GetValue("Otel:Enabled", false))
         throw new ApplicationException("OTEL enabled but otlp endpoint not provided");
     }
 
+    builder.Logging.AddOpenTelemetry(options =>
+    {
+        options
+            .SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService("oidc_core_api"))
+            .AddConsoleExporter()
+            .AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri(otelEndpoint);
+            });
+    });
+
     builder.Services.AddOpenTelemetry()
         .ConfigureResource(resource =>
             resource.AddService(serviceName: "oidc_core_api"))
@@ -110,20 +124,21 @@ if (builder.Configuration.GetValue("Otel:Enabled", false))
             }))
         .WithMetrics(metricsBuilder => metricsBuilder
             .AddAspNetCoreInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddProcessInstrumentation()
+            .AddConsoleExporter()
+            .AddMeter("OIDCCore.API")
+            // .AddMeter("Microsoft.AspNetCore.Hosting")
+            // .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            // .AddMeter("System.Net.Http")
+            // .AddMeter("System.Net.NameResolution")
+            // .AddConsoleExporter()
             .AddOtlpExporter(options =>
             {
                 options.Endpoint = new Uri(otelEndpoint);
             })
-            .AddMeter("OIDCCore.Authentication.*")
-            .AddMeter("OIDCCore.OAuth.*")
-        );
 
-    builder.Logging.AddOpenTelemetry(loggingBuilder => loggingBuilder.AddOtlpExporter(
-        "logging",
-        options =>
-        {
-            options.Endpoint = new Uri(otelEndpoint);
-        }));
+        );
 }
 
 var app = builder.Build();

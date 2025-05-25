@@ -9,8 +9,8 @@ public class AuthenticationEvents
 
     public AuthenticationEvents(IMeterFactory meterFactory)
     {
-        Meter authEventsMeter = meterFactory.Create("OIDCCore.Authentication.Events");
-        _authenticationEvents = authEventsMeter.CreateGauge<int>("OIDCCore.Authentication.Events", description: "Authentication attempt regardless of outcome");
+        Meter authEventsMeter = meterFactory.Create("oidccore.authentication");
+        _authenticationEvents = authEventsMeter.CreateGauge<int>("attempts", description: "Authentication attempt regardless of outcome");
     }
 
     private void Record(bool success = false, User? user = null, string authType = "credentials")
