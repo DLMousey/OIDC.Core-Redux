@@ -29,6 +29,22 @@ public class ApplicationController(
                 { StatusCode = StatusCodes.Status500InternalServerError };
         }
     }
+
+    [HttpGet("authorised")]
+    public async Task<IActionResult> GetAuthorisedAsync()
+    {
+        try
+        {
+            User user = await userService.GetFromContextAsync(User);
+            IList<Application> applications = await applicationService.GetAuthorisedAsync(user);
+            return Ok(applications);
+        }
+        catch
+        {
+            return new JsonResult("An error occurred, please try again later")
+                { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+    }
     
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateAsyncViewModel vm)
@@ -54,5 +70,11 @@ public class ApplicationController(
             return new JsonResult("An error occurred, please try again later")
                 { StatusCode = StatusCodes.Status500InternalServerError };
         }
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] Guid id)
+    {
+        return Ok();
     }
 }

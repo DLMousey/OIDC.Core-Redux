@@ -28,6 +28,43 @@ public class ApplicationService(OIDCCoreMinimalDbContext context) : IApplication
     public async Task<IList<Application>> GetPublishedAsync(User user) => 
         await context.Applications.Where(a => a.UserId.Equals(user.Id)).ToListAsync();
 
+    public async Task<IList<Application>> GetAuthorisedAsync(User user) =>
+        await context.Applications.Where(a => a.Users.Contains(user)).ToListAsync();
+
     public async Task<Application?> FindAsync(string clientId) =>
-        await context.Applications.FirstOrDefaultAsync(a => a.ClientId.Equals(clientId));
+        await context.Applications
+            .Include(a => a.Users)
+            .FirstOrDefaultAsync(a => a.ClientId.Equals(clientId));
+
+    public async Task<Application?> AddUser(Application application, User user)
+    {
+        // Idempotency short circuit - absolutely do not want duplicates
+        if (application.Users.Contains(user))
+        {
+            return application;
+        }
+        
+        application.Users.Add(user);
+        
+        context.Update(application);
+        await context.SaveChangesAsync();
+
+        return application;
+    }
+
+    public async Task<Application?> RemoveUser(Application application, User user)
+    {
+        // Idempotency short circuit - absolutely do not want duplicates
+        if (!application.Users.Contains(user))
+        {
+            return application;
+        }
+        
+        application.Users.Remove(user);
+        
+        context.Update(application);
+        await context.SaveChangesAsync();
+        
+        return application;
+    }
 }

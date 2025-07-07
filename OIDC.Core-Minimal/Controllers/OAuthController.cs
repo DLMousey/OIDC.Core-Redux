@@ -313,6 +313,9 @@ public class OAuthController(
         // Purge the authorisation code from cache to prevent re-use
         await cache.RemoveAsync(strategiser.Code);
         
+        // Add the user to the application's user list
+        await applicationService.AddUser(application, user);
+        
         return Ok(new
         {
             access_token = jwtService.GenerateJwt(token),
