@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OIDC.Core-Minimal\OIDC.Core-Minimal.csproj" />
+      <ProjectReference Include="..\OIDC.Core-Redux\OIDC.Core-Redux.csproj" />
     </ItemGroup>
 
 </Project>
