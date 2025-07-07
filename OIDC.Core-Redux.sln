@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIDC.Core-Minimal", "OIDC.Core-Minimal\OIDC.Core-Minimal.csproj", "{0C572E6A-D6A2-4DC7-9B52-B85E236A8531}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIDC.Core-Redux", "OIDC.Core-Redux\OIDC.Core-Redux.csproj", "{0C572E6A-D6A2-4DC7-9B52-B85E236A8531}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{497ABA05-5C07-4E81-94B6-61E8D39A68ED}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.development.yml = docker-compose.development.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIDC.Core-Minimal-Test", "OIDC.Core-Minimal-Test\OIDC.Core-Minimal-Test.csproj", "{CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIDC.Core-Redux-Test", "OIDC.Core-Redux-Test\OIDC.Core-Redux-Test.csproj", "{CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
