@@ -1,4 +1,4 @@
-﻿namespace OIDC.Core_Minimal.Util.Middleware;
+﻿namespace OIDC.Core_Redux.Util.Middleware;
 
 public class MetricsMiddleware
 {

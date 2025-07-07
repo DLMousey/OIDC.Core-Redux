@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using OIDC.Core_Minimal_Test.TestUtil;
-using OIDC.Core_Minimal.DAL;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.Services.Implementation;
+using OIDC.Core_Redux_Test.TestUtil;
+using OIDC.Core_Redux.DAL;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.Services.Implementation;
 
-namespace OIDC.Core_Minimal_Test.Services.Implementation;
+namespace OIDC.Core_Redux_Test.Services.Implementation;
 
 [TestFixture]
 public class AccessTokenServiceTest

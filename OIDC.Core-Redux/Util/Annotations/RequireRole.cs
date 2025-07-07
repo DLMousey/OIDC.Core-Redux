@@ -1,9 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using OIDC.Core_Minimal.DAL.Entities;
 
-namespace OIDC.Core_Minimal.Util.Annotations;
+namespace OIDC.Core_Redux.Util.Annotations;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class RequireRole : Attribute, IAuthorizationFilter

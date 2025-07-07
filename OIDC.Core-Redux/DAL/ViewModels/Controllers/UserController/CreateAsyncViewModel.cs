@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
+namespace OIDC.Core_Redux.DAL.ViewModels.Controllers.UserController;
 
 public class CreateAsyncViewModel
 {

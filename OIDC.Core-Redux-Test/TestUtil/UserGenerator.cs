@@ -1,7 +1,7 @@
 using Bogus;
-using OIDC.Core_Minimal.DAL.Entities;
+using OIDC.Core_Redux.DAL.Entities;
 
-namespace OIDC.Core_Minimal_Test.TestUtil;
+namespace OIDC.Core_Redux_Test.TestUtil;
 
 public static class UserGenerator
 {

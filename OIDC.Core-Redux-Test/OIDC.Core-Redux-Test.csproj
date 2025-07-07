@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>OIDC.Core_Minimal_Test</RootNamespace>
+        <RootNamespace>OIDC.Core_Redux_Test</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 

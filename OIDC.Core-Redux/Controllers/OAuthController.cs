@@ -1,23 +1,19 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.Strategies;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.OAuthController;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
-using OIDC.Core_Minimal.Services.Implementation;
-using OIDC.Core_Minimal.Services.Interface;
-using OIDC.Core_Minimal.Util.Metrics;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.Strategies;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.OAuthController;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Redux.Services.Interface;
+using OIDC.Core_Redux.Util.Metrics;
 using IFormCollection = Microsoft.AspNetCore.Http.IFormCollection;
 
-namespace OIDC.Core_Minimal.Controllers;
+namespace OIDC.Core_Redux.Controllers;
 
 [ApiController]
 [Route("/oauth")]

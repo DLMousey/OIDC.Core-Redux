@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.RolesController;
-using OIDC.Core_Minimal.Services.Interface;
-using OIDC.Core_Minimal.Util.Annotations;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.RolesController;
+using OIDC.Core_Redux.Services.Interface;
+using OIDC.Core_Redux.Util.Annotations;
 
-namespace OIDC.Core_Minimal.Controllers;
+namespace OIDC.Core_Redux.Controllers;
 
 [ApiController]
 [Route("/roles")]

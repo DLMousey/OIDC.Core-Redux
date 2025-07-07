@@ -1,6 +1,6 @@
-﻿using OIDC.Core_Minimal.DAL.Entities;
+﻿using OIDC.Core_Redux.DAL.Entities;
 
-namespace OIDC.Core_Minimal.Services.Interface;
+namespace OIDC.Core_Redux.Services.Interface;
 
 public interface IJwtService
 {

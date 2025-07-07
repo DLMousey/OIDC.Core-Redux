@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace OIDC.Core_Minimal.DAL.Entities;
+namespace OIDC.Core_Redux.DAL.Entities;
 
 public class RefreshToken
 {

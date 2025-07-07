@@ -1,4 +1,4 @@
-namespace OIDC.Core_Minimal.Util.Annotations;
+namespace OIDC.Core_Redux.Util.Annotations;
 
 public class RequireScope
 {

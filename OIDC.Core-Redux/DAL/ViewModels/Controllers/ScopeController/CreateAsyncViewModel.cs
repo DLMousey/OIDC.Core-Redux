@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OIDC.Core_Minimal.DAL.ViewModels.Controllers.ScopeController;
+namespace OIDC.Core_Redux.DAL.ViewModels.Controllers.ScopeController;
 
 public class CreateAsyncViewModel
 {

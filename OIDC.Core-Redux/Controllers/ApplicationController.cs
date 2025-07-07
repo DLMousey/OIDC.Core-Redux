@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.ApplicationController;
-using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.ApplicationController;
+using OIDC.Core_Redux.Services.Interface;
 
-namespace OIDC.Core_Minimal.Controllers;
+namespace OIDC.Core_Redux.Controllers;
 
 [ApiController]
 [Route("/applications")]

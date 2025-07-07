@@ -1,10 +1,7 @@
 ﻿using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using OIDC.Core_Minimal.Util.Attributes;
+using OIDC.Core_Redux.Util.Validators;
 
-namespace OIDC.Core_Minimal.DAL.Strategies;
+namespace OIDC.Core_Redux.DAL.Strategies;
 
 public class OAuthStrategiser
 {

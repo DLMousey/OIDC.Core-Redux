@@ -1,6 +1,4 @@
-﻿using OIDC.Core_Minimal.DAL.Entities;
-
-namespace OIDC.Core_Minimal.DAL.ViewModels.Controllers.OAuthController;
+﻿namespace OIDC.Core_Redux.DAL.ViewModels.Controllers.OAuthController;
 
 public class ConsentPayload
 {

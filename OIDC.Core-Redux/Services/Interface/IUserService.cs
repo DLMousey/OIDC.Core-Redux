@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.UserController;
 
-namespace OIDC.Core_Minimal.Services.Interface;
+namespace OIDC.Core_Redux.Services.Interface;
 
 public interface IUserService
 {

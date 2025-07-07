@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using OIDC.Core_Minimal.DAL.Configuration;
+using OIDC.Core_Redux.DAL.Configuration;
 
-namespace OIDC.Core_Minimal.DAL.Entities;
+namespace OIDC.Core_Redux.DAL.Entities;
 
 [EntityTypeConfiguration(typeof(ApplicationConfiguration))]
 public class Application

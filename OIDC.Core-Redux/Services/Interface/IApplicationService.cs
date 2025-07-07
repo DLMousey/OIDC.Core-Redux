@@ -1,7 +1,7 @@
-﻿using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.ApplicationController;
+﻿using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.ApplicationController;
 
-namespace OIDC.Core_Minimal.Services.Interface;
+namespace OIDC.Core_Redux.Services.Interface;
 
 public interface IApplicationService
 {

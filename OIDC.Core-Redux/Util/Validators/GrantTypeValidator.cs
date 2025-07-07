@@ -1,4 +1,4 @@
-﻿namespace OIDC.Core_Minimal.Util.Attributes;
+﻿namespace OIDC.Core_Redux.Util.Validators;
 
 public static class GrantTypeValidator
 {

@@ -1,4 +1,4 @@
-namespace OIDC.Core_Minimal.DAL.ViewModels.Controllers.RolesController;
+namespace OIDC.Core_Redux.DAL.ViewModels.Controllers.RolesController;
 
 public class ModifyUserRoleViewModel
 {

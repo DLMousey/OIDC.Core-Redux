@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
-using OIDC.Core_Minimal.DAL.Entities;
+using OIDC.Core_Redux.DAL.Entities;
 
-namespace OIDC.Core_Minimal.Util.Metrics;
+namespace OIDC.Core_Redux.Util.Metrics;
 
 public class AuthenticationEvents
 {

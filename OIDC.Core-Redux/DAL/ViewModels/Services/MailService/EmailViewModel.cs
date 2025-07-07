@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using OIDC.Core_Minimal.DAL.Entities;
+using OIDC.Core_Redux.DAL.Entities;
 
-namespace OIDC.Core_Minimal.DAL.ViewModels.Services.MailService;
+namespace OIDC.Core_Redux.DAL.ViewModels.Services.MailService;
 
 public class EmailViewModel
 {

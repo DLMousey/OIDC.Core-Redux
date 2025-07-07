@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using OIDC.Core_Minimal.DAL.Configuration;
+using OIDC.Core_Redux.DAL.Configuration;
 
-namespace OIDC.Core_Minimal.DAL.Entities;
+namespace OIDC.Core_Redux.DAL.Entities;
 
 [EntityTypeConfiguration(typeof(RoleConfiguration))]
 public class Role

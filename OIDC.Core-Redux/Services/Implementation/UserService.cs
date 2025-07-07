@@ -1,13 +1,13 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using OIDC.Core_Minimal.DAL;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
-using OIDC.Core_Minimal.DAL.ViewModels.Services.MailService;
-using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Redux.DAL;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Redux.DAL.ViewModels.Services.MailService;
+using OIDC.Core_Redux.Services.Interface;
 
-namespace OIDC.Core_Minimal.Services.Implementation;
+namespace OIDC.Core_Redux.Services.Implementation;
 
 public class UserService(
     OIDCCoreMinimalDbContext context,

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OIDC.Core_Minimal.DAL;
+using OIDC.Core_Redux.DAL;
 
 #nullable disable
 

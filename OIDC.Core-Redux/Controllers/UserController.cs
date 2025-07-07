@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Controllers.UserController;
-using OIDC.Core_Minimal.Services.Interface;
-using OIDC.Core_Minimal.Util.Annotations;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.UserController;
+using OIDC.Core_Redux.Services.Interface;
+using OIDC.Core_Redux.Util.Annotations;
 
-namespace OIDC.Core_Minimal.Controllers;
+namespace OIDC.Core_Redux.Controllers;
 
 [ApiController]
 [Route("/users")]
@@ -23,7 +23,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         try
         {
-            DAL.Entities.User user = await userService.CreateAsync(vm);
+            User user = await userService.CreateAsync(vm);
             return Created("/users", user);
         }
         catch (Exception ex)
@@ -48,7 +48,7 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpGet("private")]
     public async Task<IActionResult> AuthTest()
     {
-        DAL.Entities.User user = await userService.GetFromContextAsync(User);
+        User user = await userService.GetFromContextAsync(User);
         return Ok(user);
     }
 

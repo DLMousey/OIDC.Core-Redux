@@ -1,11 +1,11 @@
 using MailKit.Net.Smtp;
 using MimeKit;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.DAL.ViewModels.Services.MailService;
-using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.DAL.ViewModels.Services.MailService;
+using OIDC.Core_Redux.Services.Interface;
 using RazorEngineCore;
 
-namespace OIDC.Core_Minimal.Services.Implementation;
+namespace OIDC.Core_Redux.Services.Implementation;
 
 public class MailService : IMailService
 {

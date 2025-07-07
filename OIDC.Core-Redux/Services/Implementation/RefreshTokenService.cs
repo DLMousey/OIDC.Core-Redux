@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OIDC.Core_Minimal.DAL;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Redux.DAL;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.Services.Interface;
 
-namespace OIDC.Core_Minimal.Services.Implementation;
+namespace OIDC.Core_Redux.Services.Implementation;
 
 public class RefreshTokenService(OIDCCoreMinimalDbContext context) : IRefreshTokenService
 {

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OIDC.Core_Minimal.DAL.Entities;
+using OIDC.Core_Redux.DAL.Entities;
 
-namespace OIDC.Core_Minimal.DAL.Configuration;
+namespace OIDC.Core_Redux.DAL.Configuration;
 
 public class RoleConfiguration : IEntityTypeConfiguration<Role>
 {

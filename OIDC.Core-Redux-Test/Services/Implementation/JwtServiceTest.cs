@@ -1,15 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using OIDC.Core_Minimal_Test.TestUtil;
-using OIDC.Core_Minimal.DAL;
-using OIDC.Core_Minimal.DAL.Entities;
-using OIDC.Core_Minimal.Services.Implementation;
-using OIDC.Core_Minimal.Services.Interface;
+using OIDC.Core_Redux_Test.TestUtil;
+using OIDC.Core_Redux.DAL.Entities;
+using OIDC.Core_Redux.Services.Implementation;
+using OIDC.Core_Redux.Services.Interface;
 
-namespace OIDC.Core_Minimal_Test.Services.Implementation;
+namespace OIDC.Core_Redux_Test.Services.Implementation;
 
 [TestFixture]
 public class JwtServiceTest
