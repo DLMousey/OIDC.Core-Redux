@@ -106,7 +106,6 @@ if (builder.Configuration.GetValue("Otel:Enabled", false))
             .SetResourceBuilder(
                 ResourceBuilder.CreateDefault()
                     .AddService("oidc_core_api"))
-            // .AddConsoleExporter()
             .AddOtlpExporter(options =>
             {
                 options.Endpoint = new Uri(otelEndpoint);
@@ -127,13 +126,11 @@ if (builder.Configuration.GetValue("Otel:Enabled", false))
             .AddAspNetCoreInstrumentation()
             .AddRuntimeInstrumentation()
             .AddProcessInstrumentation()
-            .AddConsoleExporter()
             .AddMeter("OIDCCore.API")
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
             .AddMeter("System.Net.Http")
             .AddMeter("System.Net.NameResolution")
-            // .AddConsoleExporter()
             .AddOtlpExporter(options =>
             {
                 options.Endpoint = new Uri(otelEndpoint);

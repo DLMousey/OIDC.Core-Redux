@@ -8,7 +8,8 @@ public static class GrantTypeValidator
         "client_credentials",
         "urn:ietf:params:oauth:grant-type:device_code",
         "refresh_token",
-        "password"
+        "password",
+        "oidc"
     };
 
     public static bool Validate(string? value) => GrantTypes.Contains(value);

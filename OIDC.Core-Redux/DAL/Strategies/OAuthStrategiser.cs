@@ -15,6 +15,7 @@ public class OAuthStrategiser
         DeviceCode,
         RefreshToken,
         PasswordGrant,
+        OpenIdConnect,
         Unknown
     };
     
@@ -82,6 +83,7 @@ public class OAuthStrategiser
 
         // Existence
         bool wantsCodeResponse = ResponseType is "code";
+        bool hasOpenIdScope = Scopes.Contains("openid");
         bool hasCode = !string.IsNullOrEmpty(Code);
         bool hasClientId = !string.IsNullOrEmpty(ClientId);
         bool hasClientSecret = !string.IsNullOrEmpty(ClientSecret);
@@ -157,7 +159,14 @@ public class OAuthStrategiser
                                hasUsername &&
                                hasPassword &&
                                hasClientId;
-                               
+
+        bool isOidcGrant = wantsCodeResponse &&
+                           hasGrantType &&
+                           validGrantType &&
+                           hasOpenIdScope &&
+                           hasClientId &&
+                           hasState &&
+                           hasRedirectUri;
         
         if (isAuthorizationCode)
         {
@@ -197,6 +206,11 @@ public class OAuthStrategiser
         if (isPasswordGrant)
         {
             return Strategy.PasswordGrant;
+        }
+
+        if (isOidcGrant)
+        {
+            return Strategy.OpenIdConnect;
         }
         
         // If we made it all the way down here and haven't managed to match a combination of arguments
