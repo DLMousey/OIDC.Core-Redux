@@ -116,7 +116,7 @@ public class OpenIdConnectConfiguration
     public IList<string>? TokenEndpointAuthMethodsSupported { get; set; }
 
     [Description("OPTIONAL. JSON array containing a list of the JWS signing algorithms (alg values) supported by the Token Endpoint for the signature on the JWT [JWT] used to authenticate the Client at the Token Endpoint for the private_key_jwt and client_secret_jwt authentication methods. Servers SHOULD support RS256. The value none MUST NOT be used.")]
-    [JsonPropertyName("token_endpoint_auth_Signing_alg_values_supported")]
+    [JsonPropertyName("token_endpoint_auth_signing_alg_values_supported")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IList<string>? TokenEndpointAuthSigningAlgValuesSupported { get; set; }
     

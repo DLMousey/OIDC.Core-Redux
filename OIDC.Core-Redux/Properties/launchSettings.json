@@ -47,7 +47,7 @@
         "OIDCC_Database__User": "postgres",
         "OIDCC_Database__Password": "password",
         "OIDCC_Database__Name": "oidc_core_minimal",
-        "OIDCC_Otel__Enabled": "true",
+        "OIDCC_Otel__Enabled": "false",
         "OIDCC_Otel__OtlpEndpoint": "http://10.0.2.196:4317",
         "OIDCC_Otel__RootMeterName": "OIDCCore.API",
         "OTEL_TRACES_EXPORTER": "otlp",

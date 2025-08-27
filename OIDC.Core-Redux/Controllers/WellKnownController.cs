@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OIDC.Core_Redux.DAL.ViewModels.Configuration;
+using OIDC.Core_Redux.DAL.ViewModels.Controllers.WellKnownController;
 using OIDC.Core_Redux.Services.Interface;
 
 namespace OIDC.Core_Redux.Controllers;
@@ -10,7 +12,10 @@ namespace OIDC.Core_Redux.Controllers;
 [ApiController]
 [Route("/.well-known")]
 [AllowAnonymous]
-public class WellKnownController(IConfiguration configuration, IScopeService scopeService) : ControllerBase
+public class WellKnownController(
+    IConfiguration configuration, 
+    IScopeService scopeService
+) : ControllerBase
 {
     
     [HttpGet("openid-configuration")]
@@ -24,5 +29,21 @@ public class WellKnownController(IConfiguration configuration, IScopeService sco
         {
             return StatusCode(500, "An error occurred while fetching the OIDC config");
         }
+    }
+
+    [HttpGet("jwks")]
+    public IActionResult Jwks()
+    {
+        // Best guess for now about structure - there does appear to be a structure but it's opaque AF 
+        // can't quite decipher what the single char keys are meant to mean
+        IConfigurationSection section = configuration.GetSection("OIDC:JWKS");
+        IList<JsonWebKeyViewModel> entries = section.Get<IList<JsonWebKeyViewModel>>() ?? new List<JsonWebKeyViewModel>();
+        
+        foreach (JsonWebKeyViewModel model in entries)
+        {
+            model.Length = model.Key.Length;
+        }
+        
+        return Ok(entries);
     }
 }
