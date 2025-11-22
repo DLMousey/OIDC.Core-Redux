@@ -8,8 +8,8 @@ public class APIEvents
 {
     private readonly ActivitySource _activitySource;
     private readonly Meter _rootMeter;
-    private readonly UpDownCounter<int> _oauthEvents;
-    private readonly UpDownCounter<int> _authenticationEvents;
+    private readonly Gauge<int> _oauthEvents;
+    private readonly Gauge<int> _authenticationEvents;
 
     public APIEvents(
         IMeterFactory meterFactory, 
@@ -22,14 +22,14 @@ public class APIEvents
         logger.LogInformation(rootMeterName);
         
         _rootMeter = meterFactory.Create(rootMeterName);
-        _oauthEvents = _rootMeter.CreateUpDownCounter<int>(name: "oidccore.api.oauth.grant_events", description: "OAuth events");
-        _authenticationEvents = _rootMeter.CreateUpDownCounter<int>("oidccore.api.authentication.attempts",
+        _oauthEvents = _rootMeter.CreateGauge<int>(name: "oidccore.api.oauth.grant_events", description: "OAuth events");
+        _authenticationEvents = _rootMeter.CreateGauge<int>("oidccore.api.authentication.attempts",
             description: "Authentication attempts");
     }
 
     public void RecordOAuthGrantUsage(string grantType, User? user = null, Application? application = null, bool success = true)
     {
-        _oauthEvents.Add(
+        _oauthEvents.Record(
             1,
             new KeyValuePair<string, object?>("user_id", user != null ? user.Id : "no-user-id"),
             new KeyValuePair<string, object?>("application_id", application != null ? application.Id : "no-application-id"),
@@ -40,7 +40,7 @@ public class APIEvents
 
     public void RecordOAuthGrantUsage(string grantType, Guid userId, Application? application = null, bool success = true)
     {
-        _oauthEvents.Add(
+        _oauthEvents.Record(
             1,
             new KeyValuePair<string, object?>("user_id", userId),
             new KeyValuePair<string, object?>("application_id", application != null ? application.Id : "no-application-id"),
@@ -51,7 +51,7 @@ public class APIEvents
     
     public void RecordAuthenticationAttempt(User? user = null, string authType = "credentials", bool success = true)
     {
-        _authenticationEvents.Add(
+        _authenticationEvents.Record(
             1, 
             new KeyValuePair<string, object?>("user-id", user != null ? user.Id : "no-id"),
             new KeyValuePair<string, object?>("success", success),
