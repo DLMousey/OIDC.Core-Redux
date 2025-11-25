@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using OIDC.Core_Redux.DAL.Entities;
 using OIDC.Core_Redux.DAL.Strategies;
@@ -73,6 +74,8 @@ public class OAuthController(
                 return await PasswordGrant(strategiser, application);
             case OAuthStrategiser.Strategy.RefreshToken:
                 return await RefreshTokenGrant(strategiser, application);
+            case OAuthStrategiser.Strategy.OpenIdConnect:
+                return await OpenIdConnect(strategiser, application);
             default:
                 return BadRequest("Unknown oauth grant type requested");
         }
@@ -420,6 +423,7 @@ public class OAuthController(
     {
         if (strategiser.ClientSecret != application.ClientSecret)
         {
+            apiEvents.RecordOAuthGrantUsage(strategiser.GrantType!, null, application, false);
             return BadRequest("Invalid client secret provided");
         }
 
@@ -445,6 +449,15 @@ public class OAuthController(
             access_token = accessToken.Code,
             expires_in = accessToken.ExpiresAt.Subtract(DateTime.UtcNow).TotalSeconds
         });
+    }
+    
+    #endregion
+    
+    #region oidc
+
+    private async Task<IActionResult> OpenIdConnect(OAuthStrategiser strategiser, Application application)
+    {
+        return Ok();
     }
     
     #endregion

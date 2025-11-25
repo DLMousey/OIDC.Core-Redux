@@ -34,7 +34,7 @@ public class JwtService(IConfiguration configuration) : IJwtService
                 new("username", user.Username),
                 new("roles", string.Join(", ", roleNames.ToArray()))
             },
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("JWT:ExpirationMinutes", 15)),
             signingCredentials: creds
         );
 

@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OIDC.Core_Redux.DAL;
@@ -12,9 +13,11 @@ using OIDC.Core_Redux.DAL;
 namespace OIDC.Core_Minimal.DAL.Migrations
 {
     [DbContext(typeof(OIDCCoreMinimalDbContext))]
-    partial class OIDCCoreMinimalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125221216_AddAuthenticationEventTable")]
+    partial class AddAuthenticationEventTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

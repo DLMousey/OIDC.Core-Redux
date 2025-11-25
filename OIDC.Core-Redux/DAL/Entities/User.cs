@@ -34,4 +34,7 @@ public class User
 
     [JsonIgnore]
     public ICollection<Role> Roles { get; set; }
+
+    [JsonIgnore] 
+    public ICollection<AuthenticationEvent> AuthenticationEvents { get; set; }
 }

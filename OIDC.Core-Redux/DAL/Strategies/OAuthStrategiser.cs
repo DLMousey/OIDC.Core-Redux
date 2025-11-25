@@ -25,6 +25,8 @@ public class OAuthStrategiser
     public string? RedirectUri { get; set; }
     public string? Scope { get; set; }
     public string? State { get; set; }
+    
+    public string? Nonce { get; set; } // *Laughs hysterically in british english */
     public string? Code { get; set; }
     public string? CodeChallenge { get; set; }
     public string? CodeChallengeMethod { get; set; }
@@ -54,7 +56,8 @@ public class OAuthStrategiser
             PropertyInfo? dynamicProperty = GetType().GetTypeInfo().GetDeclaredProperty(key);
             if (dynamicProperty == null)
             {
-                return;
+                // Found a key we don't recognise, skip
+                continue;
             }
             
             dynamicProperty.SetValue(this, Convert.ChangeType(value, dynamicProperty.PropertyType));
@@ -90,6 +93,7 @@ public class OAuthStrategiser
         bool hasRedirectUri = !string.IsNullOrEmpty(RedirectUri);
         bool hasScope = !string.IsNullOrEmpty(Scope);
         bool hasState = !string.IsNullOrEmpty(State);
+        bool hasNonce = !string.IsNullOrEmpty(Nonce);
         bool hasCodeChallenge = !string.IsNullOrEmpty(CodeChallenge);
         bool hasCodeChallengeMethod = !string.IsNullOrEmpty(CodeChallengeMethod);
         bool hasCodeVerifier = !string.IsNullOrEmpty(CodeVerifier);
@@ -160,12 +164,10 @@ public class OAuthStrategiser
                                hasPassword &&
                                hasClientId;
 
-        bool isOidcGrant = wantsCodeResponse &&
-                           hasGrantType &&
-                           validGrantType &&
-                           hasOpenIdScope &&
+        bool isOidcGrant = hasOpenIdScope &&
                            hasClientId &&
                            hasState &&
+                           hasNonce &&
                            hasRedirectUri;
         
         if (isAuthorizationCode)
@@ -240,6 +242,13 @@ public class OAuthStrategiser
 
     private string NormaliseKey(string key)
     {
+        // Response types can have multiple space delimited values (e.g. "id_token code") - these need to be
+        // handled separately
+        if (key == "response_type")
+        {
+            
+        }
+        
         // Locate the underscore and capitalise the next letter after it
         int index = key.IndexOf('_');
         Char[] charArray = key.ToCharArray();

@@ -15,7 +15,8 @@ public class AuthenticationController(
     IJwtService jwtService,
     IRefreshTokenService refreshTokenService,
     APIEvents apiEvents,
-    ILogger<AuthenticationController> logger
+    ILogger<AuthenticationController> logger,
+    IAuthenticationEventService authenticationEventService
 ) : ControllerBase
 {
     [HttpPost("")]
@@ -29,6 +30,7 @@ public class AuthenticationController(
         User? user = await userService.FindByEmailAsync(vm.Email);
         if (user == null)
         {
+            await authenticationEventService.RecordAuthenticationEvent(false, null, HttpContext.Connection.RemoteIpAddress);
             return BadRequest("Invalid credentials provided");
         }
 
@@ -41,6 +43,7 @@ public class AuthenticationController(
         if (userService.ValidateCredentials(user, vm.Password))
         {
             logger.LogInformation("Recorded successful authentication attempt");
+            await authenticationEventService.RecordAuthenticationEvent(true, user, HttpContext.Connection.RemoteIpAddress);
             apiEvents.RecordAuthenticationAttempt(user);
             return Ok(new
             {
@@ -52,6 +55,7 @@ public class AuthenticationController(
 
         logger.LogInformation("Recorded failed authentication attempt");
         apiEvents.RecordAuthenticationAttempt(user, "credentials", false);
+        await authenticationEventService.RecordAuthenticationEvent(false, user, HttpContext.Connection.RemoteIpAddress);
         return BadRequest("Invalid credentials provided");
     }
 

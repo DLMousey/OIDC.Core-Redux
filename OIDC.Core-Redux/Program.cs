@@ -82,6 +82,7 @@ builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IScopeService, ScopeService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IAuthenticationEventService, AuthenticationEventService>();
 
 // Metrics
 builder.Services.AddSingleton<APIEvents>();
