@@ -7,6 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		config\prometheus.yml = config\prometheus.yml
 		config\otel-collector.yml = config\otel-collector.yml
 		docker-compose.development.yml = docker-compose.development.yml
+		README.md = README.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		logo_transparent.png = logo_transparent.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIDC.Core-Redux-Test", "OIDC.Core-Redux-Test\OIDC.Core-Redux-Test.csproj", "{CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B}"
