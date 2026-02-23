@@ -34,16 +34,12 @@ public class WellKnownController(
     [HttpGet("jwks")]
     public IActionResult Jwks()
     {
-        // Best guess for now about structure - there does appear to be a structure but it's opaque AF 
-        // can't quite decipher what the single char keys are meant to mean
         IConfigurationSection section = configuration.GetSection("OIDC:JWKS");
         IList<JsonWebKeyViewModel> entries = section.Get<IList<JsonWebKeyViewModel>>() ?? new List<JsonWebKeyViewModel>();
         
-        foreach (JsonWebKeyViewModel model in entries)
+        return Ok(new
         {
-            model.Length = model.Key.Length;
-        }
-        
-        return Ok(entries);
+            keys = entries
+        });
     }
 }
