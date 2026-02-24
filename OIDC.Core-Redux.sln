@@ -29,4 +29,6 @@ Global
 		{CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
 EndGlobal
