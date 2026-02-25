@@ -1,0 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using OIDC.Core.DAL.Configuration;
+
+namespace OIDC.Core.DAL.Entities;
+
+[EntityTypeConfiguration(typeof(RoleConfiguration))]
+public class Role
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public string Name { get; set; }
+
+    public ICollection<User> Users { get; set; }
+}

@@ -5,10 +5,6 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ATypeInfo_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fde3edec1170e48a0a2478d8743508635c8e910_003F5c_003F943a440f_003FTypeInfo_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AOtlpExporterTransmissionHandler_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FSourcesCache_003F157d9040c4af96ca3f83918fdf5fe11c99d610c90b58f201b241448d2aab942_003FOtlpExporterTransmissionHandler_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7463b902_002D7cb5_002D442c_002D8e2e_002D354ce349cf50/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;OIDC.Core-Minimal-Test&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Redux_Test.DAL.Entities.AuthenticationEventTest.NewInstanceHasGuidPopulated&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Redux_Test.DAL.Entities.AuthenticationEventTest.NewInstanceHasFalsySuccessValue&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::CDF4BC45-0F5D-4BA2-A97F-FF258127BF8B::net8.0::OIDC.Core_Redux_Test.DAL.Entities.AuthenticationEventTest.NewInstanceHasCreatedAtPopulated&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+  &lt;Solution /&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/Monitoring/Metrics/=OIDC_002ECore_005FMinimal_002EUtil_002EMetrics/@EntryIndexedValue">False</s:Boolean></wpf:ResourceDictionary>
