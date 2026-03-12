@@ -18,4 +18,10 @@ public class JsonWebKeyViewModel
     
     [JsonPropertyName("n")]
     public required string KeyMaterial { get; set; }
+    
+    [JsonPropertyName("e")]
+    public required string Exponent { get; set; }
+
+    [JsonIgnore]
+    public string Path { get; set; }
 }

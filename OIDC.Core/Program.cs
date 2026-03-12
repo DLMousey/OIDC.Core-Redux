@@ -1,4 +1,5 @@
 using System.Diagnostics.Metrics;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,10 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
+    var _rsa = RSA.Create();
+    var content = File.ReadAllText(builder.Configuration.GetValue<string>("OIDC:PrivateKey:Path")!);
+    _rsa.ImportFromPem(content);
+    
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -72,8 +77,10 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration.GetValue<string>("JWT:Issuer"),
         ValidAudience = builder.Configuration.GetValue<string>("JWT:Audience"),
-        IssuerSigningKey =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JWT:SigningKey")!))
+        IssuerSigningKey = new RsaSecurityKey(_rsa),
+        ValidAlgorithms = new[] { SecurityAlgorithms.RsaSha256 },
+        LogTokenId = true,
+        LogValidationExceptions = true
     };
 });
 
@@ -89,6 +96,12 @@ builder.Services.AddScoped<IAuthenticationEventService, AuthenticationEventServi
 
 // Metrics
 builder.Services.AddSingleton<APIEvents>();
+builder.Services.AddSingleton<IJwksKeyService>(sp =>
+    new RsaKeyService(
+        privateKeyPath: builder.Configuration.GetValue<string>("OIDC:PrivateKey:Path")!,
+        keyId: builder.Configuration.GetValue<string>("OIDC:PrivateKey:KeyId")!
+    )
+);
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {

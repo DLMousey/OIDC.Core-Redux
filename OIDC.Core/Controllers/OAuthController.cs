@@ -246,7 +246,8 @@ public class OAuthController(
             ClientId = vm.ClientId,
             Scopes = vm.Scopes,
             CodeChallenge = vm.CodeChallenge,
-            CodeVerifier = vm.CodeVerifier
+            CodeVerifier = vm.CodeVerifier,
+            Nonce = vm.Nonce
         };
 
         string encodedPayload = JsonSerializer.Serialize(payload);
@@ -254,7 +255,7 @@ public class OAuthController(
             .SetSlidingExpiration(TimeSpan.FromMinutes(15));
 
         await cache.SetAsync(authorisationCode, Encoding.UTF8.GetBytes(encodedPayload), options);
-        // return Redirect(application.CallbackUrl + "?code=" + authorisationCode + "&state=" + vm.State);
+        
         return Ok(new
         {
             redirectUrl = application.CallbackUrl,
@@ -309,14 +310,20 @@ public class OAuthController(
         AccessToken token = await accessTokenService.CreateAsync(user, application, scopes);
 
         // Purge the authorisation code from cache to prevent re-use
-        await cache.RemoveAsync(strategiser.Code);
+        // await cache.RemoveAsync(strategiser.Code);
         
         // Add the user to the application's user list
         await applicationService.AddUser(application, user);
+
+        string jwt = jwtService.GenerateJwt(token, payload.Nonce);
+        
+        // logger.LogInformation("JWT: {jwt}", jwt);
         
         return Ok(new
         {
-            access_token = jwtService.GenerateJwt(token),
+            access_token = jwt,
+            token_type = "Bearer",
+            id_token = jwt,
             expires_in = token.ExpiresAt.Subtract(DateTime.UtcNow).TotalSeconds
         });
     }
@@ -456,7 +463,72 @@ public class OAuthController(
 
     private async Task<IActionResult> OpenIdConnect(OAuthStrategiser strategiser, Application application)
     {
-        return Ok();
+        // Got an OIDC request, need to validate;
+        // - Client ID is valid
+        // - Client Secret is valid
+        // - Have an authenticated user
+        // Then we need to;
+        // - Check if the user has authorised this application before
+        // - Then either;
+        //    - Create an authorisation token and wait for the exchange
+        //    - Fetch access token
+        
+        // Ignore above
+        // This is likely being hit by a front channel authorisation request, we should have an authenticated user
+        // at this point available in the context (may have sent them through an auth loop already)
+        // We need to do the following;
+        // - Store the request in cache, the nonce must be added to the id token as a claim in future
+        // - State must be echoed back unchanged
+
+        DAL.Entities.User user;
+
+        try
+        {
+            user = await userService.GetFromContextAsync(User);
+        }
+        catch (Exception e)
+        {
+            return Redirect("http://localhost:3000/oauth" + Request.QueryString);
+        }
+        
+        user = await userService.FindByIdAsync(Guid.Parse("328bdc0e-b161-4e32-a837-995a8c0f8d74"));
+
+        Request.EnableBuffering();
+        Request.Body.Position = 0;
+        
+        var rawBody = await new StreamReader(Request.Body).ReadToEndAsync();
+        
+        apiEvents.RecordOAuthGrantUsage("openid", user);
+        string authorisationCode = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(16));
+        
+        ConsentPayload payload = new ConsentPayload
+        {
+            UserId = user.Id,
+            ClientId = strategiser.ClientId,
+            Scopes = strategiser.Scopes,
+            CodeChallenge = strategiser.Nonce,
+            CodeVerifier = strategiser.State
+        };
+        
+        
+        string encodedPayload = JsonSerializer.Serialize(payload);
+        DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(15));
+        
+        await cache.SetAsync(authorisationCode, Encoding.UTF8.GetBytes(encodedPayload), options);
+        
+        // Response.Redirect(strategiser.RedirectUri);
+        
+        // Response.Redirect("http://localhost:3000/oauth" + Request.QueryString);
+        
+        return Ok(new
+        {
+            application,
+            scopes = strategiser.Scopes,
+            redirectUrl = strategiser.RedirectUri,
+            state = strategiser.State,
+            oidc = true
+        });
     }
     
     #endregion

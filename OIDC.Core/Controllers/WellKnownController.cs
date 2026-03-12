@@ -1,5 +1,7 @@
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OIDC.Core.DAL.ViewModels.Configuration;
 using OIDC.Core.DAL.ViewModels.Controllers.WellKnownController;
 using OIDC.Core.Services.Interface;
@@ -11,7 +13,8 @@ namespace OIDC.Core.Controllers;
 [AllowAnonymous]
 public class WellKnownController(
     IConfiguration configuration, 
-    IScopeService scopeService
+    IScopeService scopeService,
+    IJwksKeyService jwksKeyService
 ) : ControllerBase
 {
     
@@ -31,12 +34,22 @@ public class WellKnownController(
     [HttpGet("jwks")]
     public IActionResult Jwks()
     {
-        IConfigurationSection section = configuration.GetSection("OIDC:JWKS");
-        IList<JsonWebKeyViewModel> entries = section.Get<IList<JsonWebKeyViewModel>>() ?? new List<JsonWebKeyViewModel>();
+        RSAParameters p = jwksKeyService.GetPublicKeyParameters();
+        string keyId = jwksKeyService.GetKeyId();
         
-        return Ok(new
+        List<JsonWebKeyViewModel> keys = new List<JsonWebKeyViewModel>();
+        
+        keys.Add(new JsonWebKeyViewModel
         {
-            keys = entries
+            KeyType = "RSA",
+            KeyId = keyId,
+            IntendedUse = "sig",
+            Algorithm = "RS256",
+            KeyMaterial = Base64UrlEncoder.Encode(p.Modulus),
+            Exponent = Base64UrlEncoder.Encode(p.Exponent),
+            Path = ""
         });
+
+        return Ok(new { keys = keys });
     }
 }

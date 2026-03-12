@@ -4,6 +4,22 @@
   graf_data: {}
   
 services:
+  traefik:
+    image: "traefik:v2.0.0-rc3"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  
+  
   cache:
     image: redis:7-alpine
     restart: unless-stopped
@@ -19,24 +35,46 @@ services:
       - "5432:5432"
     environment:
       - "POSTGRES_PASSWORD=password"
-      
-#  oidc.core-minimal:
-#    build:
-#      context: .
-#      dockerfile: OIDC.Core-Minimal/Dockerfile
-#    environment:
-#      - "OIDCC_Database__FromEnvironment=true"
-#      - "OIDCC_Database__RunMigrations=true"
-#      - "OIDCC_Database__Host=database"
-#      - "OIDCC_Database__Port=5432"
-#      - "OIDCC_Database__User=postgres"
-#      - "OIDCC_Database__Password=password"
-#      - "OIDCC_Database__Database=oidc_core_minimal"
-#      - "OTEL_TRACES_EXPORTER=otlp"
-#      - "OTEL_METRICS_EXPORTER=otlp"
-#      - "OTEL_LOGS_EXPORTER=otlp"
-#      - "OTEL_SERVICE_NAME=Oidc.Core-Redux_API"
     
+  api:
+    build:
+      context: ./OIDC.Core
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - OIDCC_Database__FromEnvironment=true
+      - OIDCC_Database__RunMigrations=true
+      - OIDCC_Database__Host=database
+      - OIDCC_Database__Port=5432
+      - OIDCC_Database__User=postgres
+      - OIDCC_Database__Password=password
+      - OIDCC_Database__Name=oidc_core_minimal
+      - OIDCC_Otel__Enabled=true
+      - OIDCC_Otel__OtlpEndpoint=http://otel-collector:4317
+      - OIDCC_Otel__RootMeterName=OIDCCore.API
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_SERVICE_NAME=oidc_core_api
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - OTEL_DOTNET_AUTO_METRICS_ADDITIONAL_SOURCES=OIDCCore.API
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`api.oidc.core`) || Host(`oidc.core`) && PathPrefix(`/.well-known`)"
+      - "traefik.http.routers.api.entrypoints=web"
+    
+  web:
+    build:
+      context: ./../OIDC.Core-Redux-Nuxt
+      dockerfile: Dockerfile
+    environment:
+      - NUXT_API_PROTOCOL=https
+      - NUXT_API_DOMAIN=api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ui.rule=Host(`oidc.core`)"
+      - "traefik.http.routers.ui.entrypoints=web"
+#    
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     command: ["--config=/etc/otel-collector.yml"]
@@ -67,6 +105,10 @@ services:
       - "3500:3000"
     volumes:
       - graf_data:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.oidccore`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
     
   loki:
     image: grafana/loki:latest

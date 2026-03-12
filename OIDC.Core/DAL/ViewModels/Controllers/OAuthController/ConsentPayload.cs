@@ -11,4 +11,6 @@ public class ConsentPayload
     public string? CodeChallenge { get; set; }
 
     public string? CodeVerifier { get; set; }
+
+    public string? Nonce { get; set; }
 }
